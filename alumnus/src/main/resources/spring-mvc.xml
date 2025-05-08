@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns="http://www.springframework.org/schema/beans"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:mvc="http://www.springframework.org/schema/mvc"
+		xmlns:tx="http://www.springframework.org/schema/tx"	
+		xsi:schemaLocation="
+				http://www.springframework.org/schema/beans
+				http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+				http://www.springframework.org/schema/context
+				http://www.springframework.org/schema/context/spring-context-4.2.xsd
+				http://www.springframework.org/schema/mvc
+				http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+				http://www.springframework.org/schema/tx
+				http://www.springframework.org/schema/tx/spring-tx-4.2.xsd ">
+	
+	<!-- 配置静态处理 -->			
+	<mvc:resources location="/static/" mapping="/static/**"></mvc:resources>
+	<!-- 添加注解驱动扫描 -->
+	<mvc:annotation-driven />
+	<context:component-scan base-package="demo" />
+	<!-- 添加视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/WEB-VIEWS/" />
+		<property name="suffix" value=".jsp" />
+	</bean>	
+	<!-- 添加JSON解析 -->
+	<bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/html;charse=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="mappingJacksonHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+	<!-- 添加MyBatis配置 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://127.0.0.1:3306/almn?useUnicode=true&amp;useSSL=false" />
+		<property name="username" value="root" />
+		<property name="password" value="123456" />
+	</bean>
+	<!-- 将Spring与MyBatis结合 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 添加MyBatis配置文件 -->
+		<property name="configLocation" value="classpath:./mybatis-config.xml" />
+		<!-- 自动扫描mapping文件mybatis中用于存放sql语句的文件 -->
+		<property name="mapperLocations" value="classpath:demo/dao/mapper/*.xml" />
+	</bean>
+	<!-- 添加Mapper接口所在的package -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="demo.dao.mapper" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+	
+	<!-- 配置文件上传解析器 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> 
+         <!-- 指定所上传文件的总大小不能超过20M。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 --> 
+         <property name="maxUploadSize" value="20000000"/>
+         <property name="defaultEncoding" value="utf-8"></property>
+    </bean>
+	
+	<!-- 添加拦截器 -->
+	<mvc:interceptors>
+		<!-- 定义登录拦截器 -->
+		<mvc:interceptor>
+			<!-- 定义被拦截的链接 -->
+			<mvc:mapping path="/**"/>
+			<!-- 定义不被拦截的链接 -->
+			<mvc:exclude-mapping path="/static/**"/>
+			<!-- 指定拦截器的实现类 -->
+			<bean class="demo.handler.loginInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
+</beans>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<!-- 默认的基础设置 -->
+		<setting name="logImpl" value="LOG4J"/><!-- 配置默认的日志打印工具为LOG4J -->
+		<setting name="mapUnderscoreToCamelCase" value="true"/><!-- 驼峰自动映射 -->
+		<setting name="cacheEnabled" value="false"/><!-- 关闭缓存 -->
+	</settings>
+	<plugins>
+		<!-- 添加分页插件 -->
+		<plugin interceptor="com.github.pagehelper.PageInterceptor">
+			<!-- 指定数据库类型 -->
+			<property name="heleperDialect" value="mysql" />
+			<!-- 查询时传入的页数大于了总页数，默认的修改为最后一页数据，若页码小于1，则查询第一页 -->
+			<property name="reasonable" value="true" />
+			<!-- 设定当pagSize==0时，查询所有的数据 -->
+			<property name="pageSizeZero" value="true" />
+		</plugin>
+	</plugins>
+</configuration>
