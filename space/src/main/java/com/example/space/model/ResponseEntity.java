@@ -1,5 +1,6 @@
 package com.example.space.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -7,9 +8,13 @@ import org.slf4j.LoggerFactory;
 
 @Setter
 @Getter
+@Schema(description = "统一响应结构")
 public class ResponseEntity<T> {
+    @Schema(description = "响应状态码", example = "200")
     private int code;
+    @Schema(description = "响应消息", example = "success")
     private String message;
+    @Schema(description = "响应数据")
     private T data;
     private static final Logger logger = LoggerFactory.getLogger(ResponseEntity.class);
     private static final int SUCCESS_CODE = ResponseCodeEnum.SUCCESS.getCode();
