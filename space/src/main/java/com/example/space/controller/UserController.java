@@ -1,5 +1,6 @@
 package com.example.space.controller;
 
+import com.example.space.model.ResponseEntity;
 import com.example.space.model.User;
 import com.example.space.server.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,8 +30,8 @@ public class UserController {
 
     @GetMapping(value = "/all", produces = "application/json")
     @Operation(summary = "查询所有用户", description = "获取用户列表")
-    @ApiResponse(responseCode = "200", description = "成功获取用户列表",
-            content = @Content(schema = @Schema(implementation = User.class)))
+    @ApiResponse(responseCode = "200", description = "获取用户列表",
+            content = @Content(schema = @Schema(implementation = ResponseEntity.class)))
     public List<User> getAllUsers() {
         List<User> users = userService.getAllUsers();
         if (users.isEmpty()) {
@@ -39,10 +40,10 @@ public class UserController {
         return users;
     }
 
-    @GetMapping("/{name}")
+    @GetMapping(value = "/{name}", produces = "application/json")
     @Operation(summary = "通过用户名查询用户", description = "返回与给定名称匹配的用户列表")
     @ApiResponse(responseCode = "200", description = "返回与给定名称匹配的用户列表",
-            content = @Content(schema = @Schema(implementation = User.class)))
+            content = @Content(schema = @Schema(implementation = ResponseEntity.class)))
     public List<User> getUsersByName(
             @Parameter(description = "用户名称", required = true) @PathVariable String name
     ) {
@@ -55,4 +56,5 @@ public class UserController {
         }
         return users;
     }
+
 }
