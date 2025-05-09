@@ -30,21 +30,19 @@ public class UserController {
 
     @GetMapping(value = "/all", produces = "application/json")
     @Operation(summary = "查询所有用户", description = "获取用户列表")
-    @ApiResponse(responseCode = "200", description = "获取用户列表",
-            content = @Content(schema = @Schema(implementation = ResponseEntity.class)))
-    public List<User> getAllUsers() {
+    @ApiResponse(responseCode = "200", description = "返回所有用户列表")
+    public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         if (users.isEmpty()) {
             throw new RuntimeException("No users found");
         }
-        return users;
+        return ResponseEntity.success(users);
     }
 
     @GetMapping(value = "/{name}", produces = "application/json")
     @Operation(summary = "通过用户名查询用户", description = "返回与给定名称匹配的用户列表")
-    @ApiResponse(responseCode = "200", description = "返回与给定名称匹配的用户列表",
-            content = @Content(schema = @Schema(implementation = ResponseEntity.class)))
-    public List<User> getUsersByName(
+    @ApiResponse(responseCode = "200", description = "返回与给定名称匹配的用户列表")
+    public ResponseEntity<List<User>> getUsersByName(
             @Parameter(description = "用户名称", required = true) @PathVariable String name
     ) {
         if (name == null || name.trim().isEmpty()) {
@@ -54,7 +52,7 @@ public class UserController {
         if (users.isEmpty()) {
             throw new RuntimeException("No users found with name: " + name);
         }
-        return users;
+        return ResponseEntity.success(users);
     }
 
 }
