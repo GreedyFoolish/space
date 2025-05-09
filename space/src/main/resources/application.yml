@@ -28,4 +28,6 @@ mybatis:
 #debug: true
 logging:
   level:
-    org.springframework: DEBUG
+    root: INFO
+#  file:
+#    name: ./src/main/resources/app.log

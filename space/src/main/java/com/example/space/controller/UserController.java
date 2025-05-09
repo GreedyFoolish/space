@@ -2,11 +2,9 @@ package com.example.space.controller;
 
 import com.example.space.model.ResponseEntity;
 import com.example.space.model.User;
-import com.example.space.server.UserService;
+import com.example.space.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

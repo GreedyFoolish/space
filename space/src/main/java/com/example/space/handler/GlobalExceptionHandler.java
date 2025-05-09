@@ -2,6 +2,7 @@ package com.example.space.handler;
 
 import com.example.space.model.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
@@ -46,8 +47,8 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        // 如果返回类型已经是 ResponseEntity，则不再包装
-        if (returnType.getParameterType().equals(ResponseEntity.class)) {
+        // 如果返回类型是 ResponseEntity 或其子类，则不再包装
+        if (ResponseEntity.class.isAssignableFrom(returnType.getParameterType())) {
             return false;
         }
 
@@ -60,7 +61,7 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
 
         // 排除 Swagger 和 Actuator 相关路径
         for (String path : EXCLUDE_PATHS) {
-            if (requestUri.startsWith(path)) {
+            if (StringUtils.startsWith(requestUri, path)) {
                 return false;
             }
         }
@@ -87,7 +88,7 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         // 特殊处理 String 类型，防止被包装成 JSON 导致响应格式错误
         if (body instanceof String) {
-            return ResponseEntity.success(body).toString();
+            return ResponseEntity.success(body);
         }
         // 将原始返回值 body 包装成 ResponseEntity 格式
         return ResponseEntity.success(body);

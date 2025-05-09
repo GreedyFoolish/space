@@ -1,4 +1,4 @@
-package com.example.space.server;
+package com.example.space.service;
 
 import com.example.space.model.User;
 import com.example.space.repository.UserRepository;
