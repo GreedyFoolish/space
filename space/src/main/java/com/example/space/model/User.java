@@ -22,4 +22,5 @@ public class User {
     @Column(name = "code")
     @Schema(description = "用户编码", example = "hangman")
     private String code;
+
 }

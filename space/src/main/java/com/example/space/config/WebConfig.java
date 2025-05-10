@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
-        // 只启用 JSON 内容协商，避免模板引擎干扰 API 响应
+        // 只启用 JSON 内容协商，避免模板引擎干扰 API 响应。不配置这个会导致在抛出异常时，请求路径会重复拼接
         registry.enableContentNegotiation(new MappingJackson2JsonView());
     }
 
