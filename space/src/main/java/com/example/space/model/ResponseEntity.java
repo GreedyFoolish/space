@@ -1,15 +1,25 @@
 package com.example.space.model;
 
+import com.example.space.exception.BusinessException;
+import com.example.space.exception.ResourceNotFoundException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Setter
 @Getter
+@Schema(description = "统一响应结构")
 public class ResponseEntity<T> {
+    @Schema(description = "响应状态码", example = "200")
     private int code;
+    @Schema(description = "响应消息", example = "success")
     private String message;
+    @Schema(description = "响应数据")
     private T data;
     private static final Logger logger = LoggerFactory.getLogger(ResponseEntity.class);
     private static final int SUCCESS_CODE = ResponseCodeEnum.SUCCESS.getCode();
@@ -40,6 +50,22 @@ public class ResponseEntity<T> {
 
     public static <T> ResponseEntity<T> custom(int code, String message, T data) {
         return new ResponseEntity<>(code, message, data);
+    }
+
+    public static Map<String, Object> fromBusinessException(BusinessException ex) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("code", ex.getCode());
+        data.put("message", ex.getMessage());
+        data.put("data", ex.getData());
+        return data;
+    }
+
+    public static Map<String, Object> fromResourceNotFoundException(ResourceNotFoundException ex) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("code", ex.getCode());
+        data.put("message", ex.getMessage());
+        data.put("data", null);
+        return data;
     }
 
 }

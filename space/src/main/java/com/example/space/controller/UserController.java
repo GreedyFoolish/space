@@ -2,8 +2,10 @@ package com.example.space.controller;
 
 import com.example.space.model.ResponseEntity;
 import com.example.space.model.User;
-import com.example.space.server.UserService;
+import com.example.space.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,26 +26,31 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    @Operation(summary = "查询所有用户", description = "返回所有用户列表")
+    @GetMapping(value = "/all", produces = "application/json")
+    @Operation(summary = "查询所有用户", description = "获取用户列表")
+    @ApiResponse(responseCode = "200", description = "返回所有用户列表")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         if (users.isEmpty()) {
-            return ResponseEntity.failure("No users found");
+            throw new RuntimeException("No users found");
         }
         return ResponseEntity.success(users);
     }
 
-    @GetMapping("/{name}")
+    @GetMapping(value = "/{name}", produces = "application/json")
     @Operation(summary = "通过用户名查询用户", description = "返回与给定名称匹配的用户列表")
-    public ResponseEntity<List<User>> getUsersByName(@PathVariable String name) {
+    @ApiResponse(responseCode = "200", description = "返回与给定名称匹配的用户列表")
+    public ResponseEntity<List<User>> getUsersByName(
+            @Parameter(description = "用户名称", required = true) @PathVariable String name
+    ) {
         if (name == null || name.trim().isEmpty()) {
-            return ResponseEntity.failure("No invalid user name");
+            throw new RuntimeException("Invalid user name");
         }
         List<User> users = userService.getUsersByName(name);
         if (users.isEmpty()) {
-            return ResponseEntity.failure("No users found with name: " + name);
+            throw new RuntimeException("No users found with name: " + name);
         }
         return ResponseEntity.success(users);
     }
+
 }
