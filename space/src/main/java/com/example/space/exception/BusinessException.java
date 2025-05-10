@@ -19,4 +19,8 @@ public class BusinessException extends RuntimeException {
         this.data = data;
     }
 
+    public static BusinessException of(int code, String message) {
+        return new BusinessException(code, message);
+    }
+
 }
