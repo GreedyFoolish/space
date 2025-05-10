@@ -4,7 +4,6 @@ import com.example.space.exception.BusinessException;
 import com.example.space.exception.ResourceNotFoundException;
 import com.example.space.model.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
@@ -22,15 +21,29 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @ControllerAdvice
 public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-    private static final String[] EXCLUDE_PATHS = {
+
+    // 排除路径
+    private final String[] excludePaths = {
             "/v3/api-docs",
             "/swagger-ui",
             "/actuator"
     };
+
+    // 正则模式数组（用于更精确匹配）
+    private final Pattern[] excludePathPatterns;
+
+    public GlobalExceptionHandler() {
+        // 初始化正则模式
+        this.excludePathPatterns = new Pattern[excludePaths.length];
+        for (int i = 0; i < excludePaths.length; i++) {
+            excludePathPatterns[i] = Pattern.compile("^" + Pattern.quote(excludePaths[i]));
+        }
+    }
 
     // 统一业务异常
     @ExceptionHandler(BusinessException.class)
@@ -76,16 +89,16 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
             return false;
         }
 
-        // 获取当前请求 URI（通过外部变量传递）
         String requestUri = getCurrentRequestUri();
 
+        // 如果无法获取 URI，默认不拦截
         if (requestUri == null) {
             return true;
         }
 
-        // 排除 Swagger 和 Actuator 相关路径
-        for (String path : EXCLUDE_PATHS) {
-            if (StringUtils.startsWith(requestUri, path)) {
+        // 排除特定路径格式
+        for (Pattern pattern : excludePathPatterns) {
+            if (pattern.matcher(requestUri).find()) {
                 return false;
             }
         }
@@ -96,16 +109,13 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
     // 获取当前请求 URI
     private String getCurrentRequestUri() {
         try {
-            // 获取当前线程的请求属性
-            Object requestAttributes = RequestContextHolder.currentRequestAttributes();
-            if (requestAttributes != null && requestAttributes instanceof ServletRequestAttributes) {
-                HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-                return request != null ? request.getRequestURI() : null;
-            }
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            HttpServletRequest request = attributes.getRequest();
+            return request != null ? request.getRequestURI() : null;
         } catch (Exception e) {
-            return null; // 如果无法获取请求对象，返回 null
+            logger.warn("无法获取当前请求 URI，可能是异步调用或非 Web 请求", e);
+            return null;
         }
-        return null;
     }
 
     @Override
