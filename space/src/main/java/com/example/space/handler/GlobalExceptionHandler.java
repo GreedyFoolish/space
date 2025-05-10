@@ -1,5 +1,7 @@
 package com.example.space.handler;
 
+import com.example.space.exception.BusinessException;
+import com.example.space.exception.ResourceNotFoundException;
 import com.example.space.model.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -10,13 +12,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import java.util.NoSuchElementException;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
@@ -27,22 +32,41 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
             "/actuator"
     };
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleException(Exception ex) {
-        logger.error("Global exception occurred: {}", ex.getMessage(), ex);
-        return ResponseEntity.failure(ex.getMessage());
+    // 统一业务异常
+    @ExceptionHandler(BusinessException.class)
+    public Map<String, Object> handleBusinessException(BusinessException ex) {
+        logger.error("业务逻辑异常：{}", ex.getMessage(), ex);
+        return ResponseEntity.fromBusinessException(ex);
     }
 
+    // 资源未找到
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public Map<String, Object> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        logger.error("资源未找到：{}", ex.getMessage(), ex);
+        return ResponseEntity.fromResourceNotFoundException(ex);
+    }
+
+    // 参数校验异常
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
+        logger.error("参数验证失败：{}", errors);
+        return ResponseEntity.failure("参数验证失败： " + errors);
+    }
+
+    // 运行时异常兜底
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
-        logger.error("Runtime exception occurred: {}", ex.getMessage(), ex);
-        return ResponseEntity.failure(ex.getMessage());
+        logger.error("运行时异常：{}", ex.getMessage(), ex);
+        return ResponseEntity.failure("内部服务器错误");
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Object> handleNoSuchElementException(NoSuchElementException ex) {
-        logger.error("NoSuchElementException occurred: {}", ex.getMessage(), ex);
-        return ResponseEntity.failure(ex.getMessage());
+    // 所有其他异常兜底
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleAllExceptions(Exception ex) {
+        logger.error("未知异常：{}", ex.getMessage(), ex);
+        return ResponseEntity.failure("发生系统错误");
     }
 
     @Override
