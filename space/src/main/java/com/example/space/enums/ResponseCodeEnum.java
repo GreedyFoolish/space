@@ -1,9 +1,10 @@
-package com.example.space.model;
+package com.example.space.enums;
 
 import lombok.Getter;
 
 @Getter
 public enum ResponseCodeEnum {
+
     SUCCESS(200, "Success"), // 请求成功
     CREATED(201, "Created"), // 资源创建成功
     ACCEPTED(202, "Accepted"), // 请求被接受，但尚未处理完成

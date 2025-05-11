@@ -122,7 +122,7 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         // 特殊处理 String 类型，防止被包装成 JSON 导致响应格式错误
         if (body instanceof String) {
-            return ResponseEntity.success(body);
+            return body;
         }
         // 将原始返回值 body 包装成 ResponseEntity 格式
         return ResponseEntity.success(body);
