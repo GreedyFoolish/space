@@ -1,4 +1,4 @@
-package com.example.space.model;
+package com.example.space.enums;
 
 import lombok.Getter;
 

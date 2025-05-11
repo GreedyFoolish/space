@@ -1,5 +1,6 @@
 package com.example.space.model;
 
+import com.example.space.enums.ResponseCodeEnum;
 import com.example.space.exception.BusinessException;
 import com.example.space.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.media.Schema;
