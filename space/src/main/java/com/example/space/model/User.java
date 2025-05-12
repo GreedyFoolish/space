@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "user", schema = "almn")
+@Table(name = "user", schema = "space")
 public class User {
 
     @Id
@@ -19,8 +19,12 @@ public class User {
     @Schema(description = "用户名", example = "张三")
     private String name;
 
-    @Column(name = "code")
-    @Schema(description = "用户编码", example = "hangman")
-    private String code;
+    @Column(name = "auth_code")
+    @Schema(description = "权限代码", example = "1000")
+    private Long authCode;
+
+    @Column(name = "password")
+    @Schema(description = "用户密码", example = "123456")
+    private String password;
 
 }
