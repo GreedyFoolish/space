@@ -1,13 +1,20 @@
 package com.example.space.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "user", schema = "almn")
+@Table(name = "user", schema = "space")
 public class User {
 
     @Id
@@ -19,8 +26,13 @@ public class User {
     @Schema(description = "用户名", example = "张三")
     private String name;
 
-    @Column(name = "code")
-    @Schema(description = "用户编码", example = "hangman")
-    private String code;
+    @Column(name = "auth_code")
+    @Schema(description = "权限代码", example = "1000")
+    private Long authCode;
+
+    @Column(name = "password")
+    @Schema(description = "用户密码", example = "123456")
+    @Size(min = 6, max = 20, message = "密码长度必须在6-20位之间")
+    private String password;
 
 }

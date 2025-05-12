@@ -1,5 +1,6 @@
 package com.example.space.handler;
 
+import com.example.space.enums.ResponseCodeEnum;
 import com.example.space.exception.BusinessException;
 import com.example.space.exception.ResourceNotFoundException;
 import com.example.space.model.ResponseEntity;
@@ -61,25 +62,25 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
 
     // 参数校验异常
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public Map<String, Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
         logger.error("参数验证失败：{}", errors);
-        return ResponseEntity.failure("参数验证失败： " + errors);
+        return ResponseEntity.fromMethodArgumentNotValidException(ResponseCodeEnum.CUSTOM_ERROR_1001.getCode(), "参数验证失败：", errors);
     }
 
     // 运行时异常兜底
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
+    public Map<String, Object> handleRuntimeException(RuntimeException ex) {
         logger.error("运行时异常：{}", ex.getMessage(), ex);
-        return ResponseEntity.failure("内部服务器错误");
+        return ResponseEntity.customMessage(ResponseCodeEnum.INTERNAL_SERVER_ERROR.getCode(), "运行时异常：" + ex.getMessage(), null);
     }
 
     // 所有其他异常兜底
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleAllExceptions(Exception ex) {
+    public Map<String, Object> handleAllExceptions(Exception ex) {
         logger.error("未知异常：{}", ex.getMessage(), ex);
-        return ResponseEntity.failure("发生系统错误");
+        return ResponseEntity.customMessage(ResponseCodeEnum.INTERNAL_SERVER_ERROR.getCode(), "系统错误：" + ex.getMessage(), null);
     }
 
     @Override
@@ -122,7 +123,7 @@ public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         // 特殊处理 String 类型，防止被包装成 JSON 导致响应格式错误
         if (body instanceof String) {
-            return ResponseEntity.success(body);
+            return body;
         }
         // 将原始返回值 body 包装成 ResponseEntity 格式
         return ResponseEntity.success(body);

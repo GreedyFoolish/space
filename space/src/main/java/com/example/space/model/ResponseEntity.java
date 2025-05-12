@@ -1,5 +1,6 @@
 package com.example.space.model;
 
+import com.example.space.enums.ResponseCodeEnum;
 import com.example.space.exception.BusinessException;
 import com.example.space.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -53,19 +54,48 @@ public class ResponseEntity<T> {
     }
 
     public static Map<String, Object> fromBusinessException(BusinessException ex) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("code", ex.getCode());
-        data.put("message", ex.getMessage());
-        data.put("data", ex.getData());
-        return data;
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", ex.getCode());
+        response.put("message", ex.getMessage());
+        response.put("data", ex.getData());
+        return response;
     }
 
     public static Map<String, Object> fromResourceNotFoundException(ResourceNotFoundException ex) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("code", ex.getCode());
-        data.put("message", ex.getMessage());
-        data.put("data", null);
-        return data;
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", ex.getCode());
+        response.put("message", ex.getMessage());
+        response.put("data", null);
+        return response;
+    }
+
+    public static Map<String, Object> fromMethodArgumentNotValidException(int code, String message, Map<String, String> data) {
+        Map<String, Object> response = new HashMap<>();
+
+        // 拼接错误信息
+        StringBuilder messageBuilder = new StringBuilder();
+
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            messageBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("; ");
+        }
+
+        String finalMessage = messageBuilder.toString();
+        if (finalMessage.endsWith("; ")) {
+            finalMessage = finalMessage.substring(0, finalMessage.length() - 2);
+        }
+
+        response.put("code", code);
+        response.put("message", finalMessage);
+        response.put("data", data);
+        return response;
+    }
+
+    public static Map<String, Object> customMessage(int code, String message, Object data) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", code);
+        response.put("message", message);
+        response.put("data", data);
+        return response;
     }
 
 }

@@ -4,7 +4,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/almn?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://127.0.0.1:3306/space?useSSL=false&serverTimezone=UTC
     username: root
     password: 123456
     hikari:
@@ -15,12 +15,17 @@ spring:
       auto-commit: true
   jpa:
     hibernate:
-       ddl-auto: update
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         show_sql: true
         format_sql: true
+
+jwt:
+  secret: 49vvw+FXTHDUF/72wY1bZEI/af0lRvko92Q6zlzrrSH6kNDFvx0OU59RsIz4W+WKqFFLb4SwDW/VJL65uQPVJA==
+  expiration: 3600000
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.example.space.model
