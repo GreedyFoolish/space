@@ -32,14 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        System.out.println("doFilterInternal 111111111");
-        if (request.getRequestURI().startsWith("/api/auth/")) {
+        String path = request.getRequestURI();
+        // 不需要认证的接口
+        if (path.startsWith("/api/auth/") || path.startsWith("/api/user/register")) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        System.out.println("doFilterInternal 22222222");
 
         // 从请求头中提取 token
         String token = extractToken(request);
@@ -60,7 +58,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
-        System.out.println("doFilterInternal 33333333");
         // 继续过滤链
         filterChain.doFilter(request, response);
     }
@@ -72,6 +69,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
 }
-
-

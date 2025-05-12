@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public class UserController {
     @PostMapping("/register")
     @Operation(summary = "用户注册", description = "")
     @ApiResponse(responseCode = "200", description = "")
-    public ResponseEntity<String> register(@Parameter(description = "用户信息") @RequestBody User user) {
+    public ResponseEntity<String> register(@Parameter(description = "用户信息") @Valid @RequestBody User user) {
         userService.registerUser(user);
         return ResponseEntity.custom(ResponseCodeEnum.SUCCESS.getCode(), "注册成功", null);
     }

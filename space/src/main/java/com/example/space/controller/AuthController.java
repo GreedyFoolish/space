@@ -2,7 +2,6 @@ package com.example.space.controller;
 
 import com.example.space.model.ResponseEntity;
 import com.example.space.model.User;
-import com.example.space.service.UserService;
 import com.example.space.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +28,6 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private final UserService userService;
 
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "通过用户名和密码获取 JWT")
