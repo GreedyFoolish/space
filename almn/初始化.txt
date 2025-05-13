@@ -1,0 +1,22 @@
+// 创建项目
+npx create-react-app alumnus
+// npm换源
+npm config set registry https://registry.npm.taobao.org
+// 进入项目,安装antd等插件
+npm install antd
+npm install redux
+npm install react-redux
+npm install react-router-dom
+npm install redux-thunk
+npm install style-loader
+npm install sass-loader
+npm install css-loader
+npm install react-dom
+npm install babel-plugin-import
+npm install --save-dev @babel/plugin-proposal-decorators
+
+git init 
+git add .
+git commit -m "备注"
+// 右击项目，点打开终端，运行如下命令再添加package.json的
+npm run eject
