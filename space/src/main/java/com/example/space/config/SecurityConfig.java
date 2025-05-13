@@ -6,6 +6,7 @@ import com.example.space.interceptor.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -24,11 +25,15 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    private final SecurityProperties securityProperties;
+    private final Environment environment;
 
     @Autowired
-    public SecurityConfig(JwtUtil jwtUtil, UserService userService) {
+    public SecurityConfig(JwtUtil jwtUtil, UserService userService, SecurityProperties securityProperties, Environment environment) {
         this.jwtUtil = jwtUtil;
         this.userService = userService;
+        this.securityProperties = securityProperties;
+        this.environment = environment;
     }
 
     /**
@@ -43,12 +48,11 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/auth", "/api/user/register").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/configuration/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter.class);
-
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService, securityProperties, environment), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

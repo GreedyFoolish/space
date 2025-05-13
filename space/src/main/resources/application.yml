@@ -21,6 +21,11 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         show_sql: true
         format_sql: true
+  profiles:
+    # 开发环境
+    active: dev
+    # 生产环境
+    # active: prod
 
 jwt:
   secret: 49vvw+FXTHDUF/72wY1bZEI/af0lRvko92Q6zlzrrSH6kNDFvx0OU59RsIz4W+WKqFFLb4SwDW/VJL65uQPVJA==
@@ -29,6 +34,12 @@ jwt:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.example.space.model
+
+app:
+  security:
+    allowed-referer-list:
+      - "http://localhost:8080/swagger-ui/index.html"
+      - "test"
 
 #debug: true
 logging:

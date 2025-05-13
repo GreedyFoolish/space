@@ -1,5 +1,6 @@
 package com.example.space.interceptor;
 
+import com.example.space.config.SecurityProperties;
 import com.example.space.service.UserService;
 import com.example.space.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -7,7 +8,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -21,20 +25,30 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-
     private final UserService userService;
+    private final SecurityProperties securityProperties;
+    private final Environment environment;
 
     @Autowired
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserService userService) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserService userService, SecurityProperties securityProperties, Environment environment) {
         this.jwtUtil = jwtUtil;
         this.userService = userService;
+        this.securityProperties = securityProperties;
+        this.environment = environment;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
+        String referer = request.getHeader("Referer");
         // 不需要认证的接口
-        if (path.startsWith("/api/auth/") || path.startsWith("/api/user/register")) {
+        if (isPathAllowed(path, referer)) {
+            // 设置匿名用户
+            UsernamePasswordAuthenticationToken anonymousAuth = new UsernamePasswordAuthenticationToken(
+                    "anonymousUser", null, AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
+            );
+            SecurityContextHolder.getContext().setAuthentication(anonymousAuth);
+            // 继续过滤链
             filterChain.doFilter(request, response);
             return;
         }
@@ -60,6 +74,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 继续过滤链
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPathAllowed(String path, String referer) {
+        // 始终允许的路径
+        if (path.startsWith("/api/auth/") || path.startsWith("/api/user/register")) {
+            return true;
+        }
+        // 只在 dev 环境下启用 referer 白名单
+        boolean isDev = environment.acceptsProfiles(Profiles.of("dev"));
+        // 如果当前环境不是 dev，则不允许任何 referer
+        if (!isDev) {
+            return false;
+        }
+        // 判断 referer 是否在白名单中
+        return securityProperties.getAllowedRefererList() != null &&
+                securityProperties.getAllowedRefererList().contains(referer);
     }
 
     private String extractToken(HttpServletRequest request) {
