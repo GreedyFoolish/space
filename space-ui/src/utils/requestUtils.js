@@ -1,4 +1,4 @@
-import cache from "@/utils/cache.js";
+import cache from "@/utils/cache.js"
 
 /**
  * 防重复提交校验函数

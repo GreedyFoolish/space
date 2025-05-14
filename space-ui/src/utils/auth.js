@@ -1,4 +1,4 @@
-const TokenKey = "Admin-Token"
+const TokenKey = "User-Token"
 
 export function getToken() {
     return sessionStorage.getItem(TokenKey)

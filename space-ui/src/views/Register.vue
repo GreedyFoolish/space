@@ -1,33 +1,22 @@
 <template>
   <div class="login-container">
-    <h2>登录</h2>
-    <el-form
-        ref="ruleFormRef"
-        :model="ruleForm"
-        :rules="rules"
-        class="demo-ruleForm"
-        label-width="auto"
-        status-icon
-        style="max-width: 600px"
-    >
+    <h2>注册</h2>
+    <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" label-width="auto" status-icon style="max-width: 600px">
+      <el-form-item label="用户名" prop="name">
+        <el-input v-model.number="ruleForm.name"/>
+      </el-form-item>
       <el-form-item label="密码" prop="password">
         <el-input v-model="ruleForm.password" autocomplete="off" type="password"/>
       </el-form-item>
-      <el-form-item label="Confirm" prop="checkPass">
-        <el-input
-            v-model="ruleForm.checkPass"
-            autocomplete="off"
-            type="password"
-        />
-      </el-form-item>
-      <el-form-item label="年龄" prop="age">
-        <el-input v-model.number="ruleForm.age"/>
+      <el-form-item label="密码确认" prop="checkPass">
+        <el-input v-model="ruleForm.checkPass" autocomplete="off" type="password"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm(ruleFormRef)">
-          Submit
+          注册
         </el-button>
-        <el-button @click="resetForm(ruleFormRef)">Reset</el-button>
+        <el-button @click="resetForm(ruleFormRef)">重置</el-button>
+        <el-button type="text" @click="toLogin">去登录</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -35,39 +24,31 @@
 
 <script setup>
 import {reactive, ref} from "vue"
+import router from "@/router/index.js";
 
 const ruleFormRef = ref()
 
-const checkAge = (rule, value, callback) => {
+const validateName = (rule, value, callback) => {
   if (!value) {
-    return callback(new Error("Please input the age"))
+    return callback(new Error("请输入姓名"))
   }
-  setTimeout(() => {
-    if (!Number.isInteger(value)) {
-      callback(new Error("Please input digits"))
-    } else {
-      if (value < 18) {
-        callback(new Error("Age must be greater than 18"))
-      } else {
-        callback()
-      }
-    }
-  }, 1000)
 }
 
 const validatePass = (rule, value, callback) => {
   if (value === "") {
-    callback(new Error("Please input the password"))
+    callback(new Error("请输入密码"))
   } else {
     if (ruleForm.checkPass !== "") {
-      if (!ruleFormRef.value) return
+      if (!ruleFormRef.value) {
+        return
+      }
       ruleFormRef.value.validateField("checkPass")
     }
     callback()
   }
 }
 
-const validatePass2 = (rule, value, callback) => {
+const confirmPass = (rule, value, callback) => {
   if (value === "") {
     callback(new Error("请再次输入密码"))
   } else if (value !== ruleForm.password) {
@@ -78,31 +59,37 @@ const validatePass2 = (rule, value, callback) => {
 }
 
 const ruleForm = reactive({
+  name: "",
   password: "",
   checkPass: "",
-  age: ""
 })
 
 const rules = reactive({
+  name: [{validator: validateName, trigger: "blur"}],
   password: [{validator: validatePass, trigger: "blur"}],
-  checkPass: [{validator: validatePass2, trigger: "blur"}],
-  age: [{validator: checkAge, trigger: "blur"}]
+  checkPass: [{validator: confirmPass, trigger: "blur"}]
 })
 
 const submitForm = (formEl) => {
-  if (!formEl) return
+  if (!formEl) {
+    return
+  }
   formEl.validate(valid => {
     if (valid) {
       console.log("submit!")
-    } else {
-      console.error("error submit!")
     }
   })
 }
 
 const resetForm = (formEl) => {
-  if (!formEl) return
+  if (!formEl) {
+    return
+  }
   formEl.resetFields()
+}
+
+const toLogin = () => {
+  router.push("/login")
 }
 </script>
 
