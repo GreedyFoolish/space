@@ -1,5 +1,6 @@
 package com.example.space.config;
 
+import com.example.space.enums.RoleEnum;
 import com.example.space.service.UserService;
 import com.example.space.util.JwtUtil;
 import com.example.space.interceptor.JwtAuthenticationFilter;
@@ -27,6 +28,12 @@ public class SecurityConfig {
     private final UserService userService;
     private final SecurityProperties securityProperties;
     private final Environment environment;
+    private final String[] SWAGGER_PATHS = new String[]{
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/configuration/**"
+    };
 
     @Autowired
     public SecurityConfig(JwtUtil jwtUtil, UserService userService, SecurityProperties securityProperties, Environment environment) {
@@ -38,6 +45,7 @@ public class SecurityConfig {
 
     /**
      * 配置过滤器链
+     * 在开发阶段，如果需要使用 swagger 进行接口测试，将 hasAnyAuthority() 替换为 permitAll()，或添加匿名用户权限
      *
      * @param http HttpSecurity
      * @return 安全过滤链
@@ -48,8 +56,14 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(SWAGGER_PATHS).permitAll()
                         .requestMatchers("/api/auth", "/api/user/register").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/configuration/**").permitAll()
+                        .requestMatchers("/api/user/**").hasAnyAuthority(
+                                RoleEnum.ANONYMOUS.getAuthority(), // 匿名用户
+                                RoleEnum.USER.getAuthority(), // 普通用户
+                                RoleEnum.ADMIN.getAuthority(), // 管理员
+                                RoleEnum.SUPER_ADMIN.getAuthority() // 超级管理员
+                        )
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService, securityProperties, environment), UsernamePasswordAuthenticationFilter.class);

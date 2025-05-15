@@ -34,6 +34,9 @@ public class UserController {
     @Operation(summary = "用户注册", description = "")
     @ApiResponse(responseCode = "200", description = "")
     public ResponseEntity<String> register(@Parameter(description = "用户信息") @Valid @RequestBody User user) {
+        if (user.getAuthCode() == null) {
+            user.setAuthCode(1000L);
+        }
         userService.registerUser(user);
         return ResponseEntity.custom(ResponseCodeEnum.SUCCESS.getCode(), "注册成功", null);
     }

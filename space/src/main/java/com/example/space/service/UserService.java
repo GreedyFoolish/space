@@ -1,6 +1,7 @@
 package com.example.space.service;
 
 import com.example.space.enums.ResponseCodeEnum;
+import com.example.space.enums.RoleEnum;
 import com.example.space.exception.BusinessException;
 import com.example.space.model.User;
 import com.example.space.repository.UserRepository;
@@ -59,12 +60,17 @@ public class UserService implements UserDetailsService {
             throw new BusinessException(ResponseCodeEnum.CUSTOM_ERROR_1005.getCode(), "未查询到该用户");
         }
 
-        User user = getUsersByName(username).get(0);
+        // 获取用户信息
+        User user = users.get(0);
+        // 获取角色枚举信息
+        RoleEnum roleEnum = RoleEnum.fromAuthCode(user.getAuthCode());
+        // 获取角色名
+        String role = roleEnum.getAuthority();
 
         return new org.springframework.security.core.userdetails.User(
                 user.getName(),
                 user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("USER"))
+                Collections.singletonList(new SimpleGrantedAuthority(role))
         );
     }
 
