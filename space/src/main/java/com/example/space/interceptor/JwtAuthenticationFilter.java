@@ -1,6 +1,9 @@
 package com.example.space.interceptor;
 
 import com.example.space.config.SecurityProperties;
+import com.example.space.enums.ResponseCodeEnum;
+import com.example.space.enums.RoleEnum;
+import com.example.space.model.ResponseEntity;
 import com.example.space.service.UserService;
 import com.example.space.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -20,6 +23,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -45,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (isPathAllowed(path, referer)) {
             // 设置匿名用户
             UsernamePasswordAuthenticationToken anonymousAuth = new UsernamePasswordAuthenticationToken(
-                    "anonymousUser", null, AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
+                    "anonymousUser", null, AuthorityUtils.createAuthorityList(RoleEnum.ANONYMOUS.getAuthority())
             );
             SecurityContextHolder.getContext().setAuthentication(anonymousAuth);
             // 继续过滤链
@@ -56,7 +60,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 从请求头中提取 token
         String token = extractToken(request);
 
-        if (token != null && jwtUtil.validateToken(token)) {
+        if (token != null) {
+            // 验证 token 是否有效
+            if (!jwtUtil.validateToken(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
+                ResponseEntity<Map<String, Object>> responseEntity = ResponseEntity.custom(ResponseCodeEnum.UNAUTHORIZED.getCode(), "token已过期", null);
+                String jsonResponse = ResponseEntity.serialize(responseEntity);
+                response.getWriter().write(jsonResponse);
+                return;
+            }
+
             // 解析 token 获取用户名
             String username = jwtUtil.getUsernameFromToken(token);
             // 根据用户名获取用户详情（角色等信息）

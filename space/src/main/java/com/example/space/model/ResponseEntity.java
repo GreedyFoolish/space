@@ -3,6 +3,7 @@ package com.example.space.model;
 import com.example.space.enums.ResponseCodeEnum;
 import com.example.space.exception.BusinessException;
 import com.example.space.exception.ResourceNotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -96,6 +97,15 @@ public class ResponseEntity<T> {
         response.put("message", message);
         response.put("data", data);
         return response;
+    }
+
+    public static String serialize(ResponseEntity<?> entity) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(entity);
+        } catch (Exception e) {
+            throw new RuntimeException("ResponseEntity序列化为JSON时出错", e);
+        }
     }
 
 }
