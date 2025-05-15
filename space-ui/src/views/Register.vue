@@ -24,7 +24,10 @@
 
 <script setup>
 import {reactive, ref} from "vue"
+import {register} from "@/api/auth/auth.js";
 import router from "@/router/index.js";
+import {useUserStore} from "@/stores/userStore.js";
+import {sha256} from "@/utils/cryptoUtils.js";
 
 const ruleFormRef = ref()
 

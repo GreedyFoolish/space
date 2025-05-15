@@ -1,9 +1,9 @@
-import router from "./router"
 import NProgress from "nprogress"
 import "nprogress/nprogress.css"
+import {usePermissionStore} from "@/stores/permissionStore.js"
 import {getToken} from "@/utils/auth"
 import {isPathMatch} from "@/utils/validate"
-import {usePermissionStore} from "@/stores/permissionStore.js"
+import router from "./router"
 
 // 白名单，无需登录即可访问的路径
 const whiteList = ["/login", "/register"]

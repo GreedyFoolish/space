@@ -1,6 +1,6 @@
 import axios from "axios"
-import {getToken} from "./auth"
 import {buildGetUrl, calculateByteLength, checkRepeatSubmit} from "@/utils/requestUtils.js"
+import {getToken} from "./auth"
 
 // 创建 axios 实例
 const service = axios.create({

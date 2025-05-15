@@ -1,9 +1,9 @@
 import {defineStore} from "pinia"
 import {getRouterList} from "@/api/system/router.js"
-import router, {constantRoutes, dynamicRoutes} from "@/router"
-import Layout from "@/layout/index.vue"
-import ParentView from "@/layout/ParentView.vue"
 import InnerLink from "@/layout/InnerLink.vue"
+import ParentView from "@/layout/ParentView.vue"
+import Layout from "@/layout/index.vue"
+import router, {constantRoutes, dynamicRoutes} from "@/router"
 
 const componentMap = {
     Layout,
