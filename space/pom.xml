@@ -99,6 +99,19 @@
             <version>9.3.0</version>
         </dependency>
 
+        <!-- 缓存相关依赖 -->
+        <!-- Redis集成Spring Boot的启动器，适用于使用Redis进行数据存储 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!-- Lettuce Redis客户端，用于连接Redis数据库 -->
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+            <version>6.6.0.RELEASE</version>
+        </dependency>
+
         <!-- 工具类依赖 -->
         <!-- Lombok库，简化POJO类的getter/setter/toString等模板代码 -->
         <dependency>

@@ -26,13 +26,14 @@ import java.util.regex.Pattern;
 
 @ControllerAdvice
 public class GlobalExceptionHandler implements ResponseBodyAdvice<Object> {
+    // 日志记录器
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // 排除路径
     private final String[] excludePaths = {
-            "/v3/api-docs",
-            "/swagger-ui",
-            "/actuator"
+        "/v3/api-docs",
+        "/swagger-ui",
+        "/actuator"
     };
 
     // 正则模式数组（用于更精确匹配）
