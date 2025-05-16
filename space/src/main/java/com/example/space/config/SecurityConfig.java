@@ -74,7 +74,7 @@ public class SecurityConfig {
                 .requestMatchers(SWAGGER_PATHS).permitAll()
                 .requestMatchers("/api/auth", "/api/user/register").permitAll()
                 .requestMatchers("/api/user/**").hasAnyAuthority(
-                    RoleEnum.ANONYMOUS.getAuthority(), // 匿名用户
+                    // RoleEnum.ANONYMOUS.getAuthority(), // 匿名用户
                     RoleEnum.USER.getAuthority(), // 普通用户
                     RoleEnum.ADMIN.getAuthority(), // 管理员
                     RoleEnum.SUPER_ADMIN.getAuthority() // 超级管理员

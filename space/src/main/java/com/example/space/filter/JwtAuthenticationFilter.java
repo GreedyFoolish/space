@@ -4,6 +4,7 @@ import com.example.space.config.SecurityProperties;
 import com.example.space.enums.RoleEnum;
 import com.example.space.service.UserService;
 import com.example.space.util.JwtUtil;
+import com.example.space.util.WebUtils;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -47,8 +47,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (isPathAllowed(path, referer)) {
             // 设置匿名用户
             UsernamePasswordAuthenticationToken anonymousAuth = new UsernamePasswordAuthenticationToken(
-                    "anonymousUser", null, AuthorityUtils.createAuthorityList(RoleEnum.ANONYMOUS.getAuthority())
+                "anonymousUser", null, AuthorityUtils.createAuthorityList(RoleEnum.ANONYMOUS.getAuthority())
             );
+            // 将匿名用户存入 SecurityContextHolder
             SecurityContextHolder.getContext().setAuthentication(anonymousAuth);
             // 继续过滤链
             filterChain.doFilter(request, response);
@@ -56,25 +57,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 从请求头中提取 token
-        String token = extractToken(request);
+        String token = WebUtils.extractBearerToken(request);
 
         if (token != null) {
             // 验证 token 是否有效
             if (!jwtUtil.validateToken(token)) {
                 throw new JwtException("无效的token");
             }
-
             // 解析 token 获取用户名
             String username = jwtUtil.getUsernameFromToken(token);
             // 根据用户名获取用户详情（角色等信息）
             UserDetails userDetails = userService.loadUserByUsername(username);
-
             // 创建认证对象
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
+                userDetails, null, userDetails.getAuthorities()
             );
+            // 设置认证详情
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
             // 将认证对象存入 SecurityContextHolder
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
@@ -96,15 +95,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         // 判断 referer 是否在白名单中
         return securityProperties.getAllowedRefererList() != null &&
-                securityProperties.getAllowedRefererList().contains(referer);
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
+            securityProperties.getAllowedRefererList().contains(referer);
     }
 
 }
