@@ -1,11 +1,10 @@
-package com.example.space.interceptor;
+package com.example.space.filter;
 
 import com.example.space.config.SecurityProperties;
-import com.example.space.enums.ResponseCodeEnum;
 import com.example.space.enums.RoleEnum;
-import com.example.space.model.ResponseEntity;
 import com.example.space.service.UserService;
 import com.example.space.util.JwtUtil;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +22,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Map;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -63,12 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null) {
             // 验证 token 是否有效
             if (!jwtUtil.validateToken(token)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json;charset=UTF-8");
-                ResponseEntity<Map<String, Object>> responseEntity = ResponseEntity.custom(ResponseCodeEnum.UNAUTHORIZED.getCode(), "token已过期", null);
-                String jsonResponse = ResponseEntity.serialize(responseEntity);
-                response.getWriter().write(jsonResponse);
-                return;
+                throw new JwtException("无效的token");
             }
 
             // 解析 token 获取用户名

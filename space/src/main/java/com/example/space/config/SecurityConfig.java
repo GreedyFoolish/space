@@ -1,9 +1,11 @@
 package com.example.space.config;
 
+import com.example.space.entrypoint.JwtAuthenticationEntryPoint;
 import com.example.space.enums.RoleEnum;
+import com.example.space.handler.CustomAccessDeniedHandler;
 import com.example.space.service.UserService;
 import com.example.space.util.JwtUtil;
-import com.example.space.interceptor.JwtAuthenticationFilter;
+import com.example.space.filter.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,19 +31,28 @@ public class SecurityConfig {
     private final UserService userService;
     private final SecurityProperties securityProperties;
     private final Environment environment;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final String[] SWAGGER_PATHS = new String[]{
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/swagger-resources/**",
-            "/configuration/**"
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/swagger-resources/**",
+        "/configuration/**"
     };
 
     @Autowired
-    public SecurityConfig(JwtUtil jwtUtil, UserService userService, SecurityProperties securityProperties, Environment environment) {
+    public SecurityConfig(JwtUtil jwtUtil,
+                          UserService userService,
+                          SecurityProperties securityProperties,
+                          Environment environment,
+                          CustomAccessDeniedHandler customAccessDeniedHandler,
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
         this.jwtUtil = jwtUtil;
         this.userService = userService;
         this.securityProperties = securityProperties;
         this.environment = environment;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     /**
@@ -58,19 +69,24 @@ public class SecurityConfig {
         http.addFilterBefore(characterEncodingFilter(), UsernamePasswordAuthenticationFilter.class);
 
         http.csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(SWAGGER_PATHS).permitAll()
-                        .requestMatchers("/api/auth", "/api/user/register").permitAll()
-                        .requestMatchers("/api/user/**").hasAnyAuthority(
-                                RoleEnum.ANONYMOUS.getAuthority(), // 匿名用户
-                                RoleEnum.USER.getAuthority(), // 普通用户
-                                RoleEnum.ADMIN.getAuthority(), // 管理员
-                                RoleEnum.SUPER_ADMIN.getAuthority() // 超级管理员
-                        )
-                        .anyRequest().authenticated()
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(SWAGGER_PATHS).permitAll()
+                .requestMatchers("/api/auth", "/api/user/register").permitAll()
+                .requestMatchers("/api/user/**").hasAnyAuthority(
+                    RoleEnum.ANONYMOUS.getAuthority(), // 匿名用户
+                    RoleEnum.USER.getAuthority(), // 普通用户
+                    RoleEnum.ADMIN.getAuthority(), // 管理员
+                    RoleEnum.SUPER_ADMIN.getAuthority() // 超级管理员
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService, securityProperties, environment), UsernamePasswordAuthenticationFilter.class);
+                .anyRequest().authenticated()
+            )
+            .exceptionHandling(
+                ex ->
+                    ex.authenticationEntryPoint(jwtAuthenticationEntryPoint) // 认证失败处理器
+                        .accessDeniedHandler(customAccessDeniedHandler) // 权限不足处理器
+            )
+            .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService, securityProperties, environment), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

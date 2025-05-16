@@ -2,6 +2,11 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    # 开发环境
+    active: dev
+    # 生产环境
+    # active: prod
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/space?useSSL=false&serverTimezone=UTC
@@ -21,15 +26,22 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         show_sql: true
         format_sql: true
-  profiles:
-    # 开发环境
-    active: dev
-    # 生产环境
-    # active: prod
+  data:
+    redis:
+      url: redis://localhost:6379
+      password: "" # 如果有密码的话填写
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-connections: 8 # 最大连接数
+          max-idle: 4        # 最大空闲连接
+          min-idle: 1        # 最小空闲连接
+          max-wait: 2000ms   # 获取连接最大等待时间
 
 jwt:
   secret: 49vvw+FXTHDUF/72wY1bZEI/af0lRvko92Q6zlzrrSH6kNDFvx0OU59RsIz4W+WKqFFLb4SwDW/VJL65uQPVJA==
-  expiration: 3600000
+  expiration: 3600000 # access token 过期时间
+  refresh-expiration: 86400000 # refresh token 过期时间（24h）
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
