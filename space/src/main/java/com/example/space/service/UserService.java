@@ -5,7 +5,6 @@ import com.example.space.enums.RoleEnum;
 import com.example.space.exception.BusinessException;
 import com.example.space.model.User;
 import com.example.space.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,7 +19,6 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }

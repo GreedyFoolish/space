@@ -6,7 +6,6 @@ import com.example.space.handler.CustomAccessDeniedHandler;
 import com.example.space.service.UserService;
 import com.example.space.util.JwtUtil;
 import com.example.space.filter.JwtAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -40,7 +39,6 @@ public class SecurityConfig {
         "/configuration/**"
     };
 
-    @Autowired
     public SecurityConfig(JwtUtil jwtUtil,
                           UserService userService,
                           SecurityProperties securityProperties,
