@@ -21,3 +21,14 @@ export const register = (data) => {
         data
     })
 }
+
+export const getCaptcha = () => {
+    return request({
+        url: "/auth/captcha",
+        method: "get",
+        headers: {
+            "isToken": false
+        },
+        responseType: "blob"
+    })
+}

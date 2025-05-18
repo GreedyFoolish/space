@@ -9,6 +9,10 @@
             <el-form-item label="密码" prop="password">
                 <el-input v-model="ruleForm.password" autocomplete="off" type="password"/>
             </el-form-item>
+            <el-form-item label="验证码" prop="captcha">
+                <el-input v-model="ruleForm.captcha" autocomplete="off"/>
+                <img :src="captchaImageUrl" @click="refreshCaptcha" alt="验证码" style="cursor: pointer;"/>
+            </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submitForm(ruleFormRef)">
                     登录
@@ -22,12 +26,14 @@
 
 <script setup>
 import {reactive, ref} from "vue"
-import {login} from "@/api/auth/auth.js"
+import {getCaptcha, login} from "@/api/auth/auth.js"
 import router from "@/router/index.js";
 import {useUserStore} from "@/stores/userStore.js";
 import {sha256} from "@/utils/cryptoUtils.js";
 
 const ruleFormRef = ref()
+const captchaKey = ref()
+const captchaImageUrl = ref()
 
 const validateName = (rule, value, callback) => {
     if (!value) {
@@ -58,6 +64,16 @@ const rules = reactive({
     name: [{validator: validateName, trigger: "blur"}],
     password: [{validator: validatePass, trigger: "blur"}]
 })
+
+function fetchCaptcha() {
+    getCaptcha().then(response => {
+        const captchaKey = response.headers.get("X-Captcha-Key");
+        captchaImageUrl.value = URL.createObjectURL(response.data);
+        sessionStorage.setItem("captchaKey", captchaKey);
+    });
+}
+
+fetchCaptcha()
 
 const submitForm = (formEl) => {
     if (!formEl) {
