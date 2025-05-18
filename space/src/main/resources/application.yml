@@ -52,6 +52,8 @@ app:
     allowed-referer-list:
       - "http://localhost:8080/swagger-ui/index.html"
       - "test"
+  captcha:
+    expiration: 5 # 验证码过期时间，单位为分钟
 
 #debug: true
 logging:
