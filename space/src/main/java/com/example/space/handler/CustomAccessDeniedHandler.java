@@ -1,7 +1,6 @@
 package com.example.space.handler;
 
-import com.example.space.enums.ResponseCodeEnum;
-import com.example.space.model.ResponseEntity;
+import com.example.space.util.ResponseUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -19,17 +18,9 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException ex) throws IOException {
-        response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         String message = "权限不足，请求被拒绝访问";
-        String requestURI = request.getRequestURI();
-        logger.warn("请求被拒绝访问: {} {}", requestURI, message);
-        ResponseEntity<String> result = ResponseEntity.custom(
-            ResponseCodeEnum.FORBIDDEN.getCode(),
-            message,
-            null
-        );
-        response.getWriter().write(ResponseEntity.serialize(result));
+        logger.warn("请求被拒绝访问: {} {}", request.getRequestURI(), message);
+        ResponseUtil.writeErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, message);
     }
 
 }

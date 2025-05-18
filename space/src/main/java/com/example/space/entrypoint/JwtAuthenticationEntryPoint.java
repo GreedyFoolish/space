@@ -1,7 +1,6 @@
 package com.example.space.entrypoint;
 
-import com.example.space.enums.ResponseCodeEnum;
-import com.example.space.model.ResponseEntity;
+import com.example.space.util.ResponseUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -20,16 +19,9 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException ex) throws IOException {
-        response.setContentType("application/json;charset=UTF-8");
-        String requestURI = request.getRequestURI();
-        logger.warn("请求被拒绝访问: {} {}", requestURI, ex.getMessage());
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        ResponseEntity<String> result = ResponseEntity.custom(
-            ResponseCodeEnum.UNAUTHORIZED.getCode(),
-            "无效的token或token已过期",
-            null
-        );
-        response.getWriter().write(ResponseEntity.serialize(result));
+        String message = "无效的token或token已过期";
+        logger.warn("请求被拒绝访问: {} {}", request.getRequestURI(), message);
+        ResponseUtil.writeErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, message);
     }
 
 }
