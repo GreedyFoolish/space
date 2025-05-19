@@ -55,40 +55,27 @@ public class ResponseEntity<T> {
     }
 
     public static Map<String, Object> fromBusinessException(BusinessException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", ex.getCode());
-        response.put("message", ex.getMessage());
-        response.put("data", ex.getData());
-        return response;
+        return customMessage(ex.getCode(), ex.getMessage(), ex.getData());
     }
 
     public static Map<String, Object> fromResourceNotFoundException(ResourceNotFoundException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", ex.getCode());
-        response.put("message", ex.getMessage());
-        response.put("data", null);
-        return response;
+        return customMessage(ex.getCode(), ex.getMessage(), null);
     }
 
     public static Map<String, Object> fromMethodArgumentNotValidException(int code, String message, Map<String, String> data) {
-        Map<String, Object> response = new HashMap<>();
-
-        // 拼接错误信息
+        // 创建一个 StringBuilder 来拼接错误信息
         StringBuilder messageBuilder = new StringBuilder();
-
+        // 遍历错误信息
         for (Map.Entry<String, String> entry : data.entrySet()) {
             messageBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("; ");
         }
-
+        // 移除最后一个分号和空格
         String finalMessage = messageBuilder.toString();
         if (finalMessage.endsWith("; ")) {
             finalMessage = finalMessage.substring(0, finalMessage.length() - 2);
         }
-
-        response.put("code", code);
-        response.put("message", finalMessage);
-        response.put("data", data);
-        return response;
+        // 返回自定义的错误信息
+        return ResponseEntity.customMessage(code, finalMessage, data);
     }
 
     public static Map<String, Object> customMessage(int code, String message, Object data) {
