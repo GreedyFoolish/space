@@ -9,9 +9,9 @@
             <el-form-item label="密码" prop="password">
                 <el-input v-model="ruleForm.password" autocomplete="off" type="password"/>
             </el-form-item>
-            <el-form-item label="验证码" prop="captcha">
-                <el-input v-model="ruleForm.captcha" autocomplete="off"/>
-                <img :src="captchaImageUrl" @click="refreshCaptcha" alt="验证码" style="cursor: pointer;"/>
+            <el-form-item label="验证码" prop="captcha" class="captcha-wrapper">
+                <el-input class="captcha-input" v-model="ruleForm.captcha" autocomplete="off"/>
+                <img class="captcha-img" :src="captchaImageUrl" @click="refreshCaptcha" alt="验证码"/>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submitForm(ruleFormRef)">
@@ -65,7 +65,19 @@ const rules = reactive({
     password: [{validator: validatePass, trigger: "blur"}]
 })
 
-function fetchCaptcha() {
+let lastClickTime = 0;
+const coolDown = 5000;
+const refreshCaptcha = () => {
+    const now = Date.now();
+    if (now - lastClickTime < coolDown) {
+        console.warn("请等待冷却时间结束");
+    } else {
+        lastClickTime = now;
+        fetchCaptcha();
+    }
+};
+
+const fetchCaptcha = () => {
     getCaptcha().then(response => {
         const captchaKey = response.headers.get("X-Captcha-Key");
         captchaImageUrl.value = URL.createObjectURL(response.data);
@@ -116,5 +128,19 @@ const toRegister = () => {
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
+
+    .captcha-wrapper {
+
+        .captcha-input {
+            width: calc(100% - 120px);
+        }
+
+        .captcha-img {
+            height: 32px;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
 }
 </style>

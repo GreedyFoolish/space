@@ -1,5 +1,5 @@
 <template>
-    <div class="login-container">
+    <div class="register-container">
         <h2>注册</h2>
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" label-width="auto" status-icon
                  style="max-width: 600px">
@@ -11,6 +11,10 @@
             </el-form-item>
             <el-form-item label="密码确认" prop="checkPass">
                 <el-input v-model="ruleForm.checkPass" autocomplete="off" type="password"/>
+            </el-form-item>
+            <el-form-item label="验证码" prop="captcha" class="captcha-wrapper">
+                <el-input class="captcha-input" v-model="ruleForm.captcha" autocomplete="off"/>
+                <img class="captcha-img" :src="captchaImageUrl" @click="refreshCaptcha" alt="验证码"/>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submitForm(ruleFormRef)">
@@ -25,12 +29,14 @@
 
 <script setup>
 import {reactive, ref} from "vue"
-import {register} from "@/api/auth/auth.js";
+import {getCaptcha, register} from "@/api/auth/auth.js";
 import router from "@/router/index.js";
 import {useUserStore} from "@/stores/userStore.js";
 import {sha256} from "@/utils/cryptoUtils.js";
 
 const ruleFormRef = ref()
+const captchaKey = ref()
+const captchaImageUrl = ref()
 
 const validateName = (rule, value, callback) => {
     if (!value) {
@@ -76,6 +82,28 @@ const rules = reactive({
     checkPass: [{validator: confirmPass, trigger: "blur"}]
 })
 
+let lastClickTime = 0;
+const coolDown = 5000;
+const refreshCaptcha = () => {
+    const now = Date.now();
+    if (now - lastClickTime < coolDown) {
+        console.warn("请等待冷却时间结束");
+    } else {
+        lastClickTime = now;
+        fetchCaptcha();
+    }
+};
+
+const fetchCaptcha = () => {
+    getCaptcha().then(response => {
+        const captchaKey = response.headers.get("X-Captcha-Key");
+        captchaImageUrl.value = URL.createObjectURL(response.data);
+        sessionStorage.setItem("captchaKey", captchaKey);
+    });
+}
+
+fetchCaptcha()
+
 const submitForm = async (formEl) => {
     if (!formEl) {
         return
@@ -112,11 +140,25 @@ const toLogin = () => {
 </script>
 
 <style scoped>
-.login-container {
+.register-container {
     max-width: 400px;
     margin: 100px auto;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
+
+    .captcha-wrapper {
+
+        .captcha-input {
+            width: calc(100% - 120px);
+        }
+
+        .captcha-img {
+            height: 32px;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
 }
 </style>
