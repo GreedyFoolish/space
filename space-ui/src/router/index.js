@@ -18,7 +18,7 @@ export const constantRoutes = [
     },
     {
         path: "/home",
-        component: () => import("@/views/Home.vue"),
+        component: () => import("@/layout/index.vue"),
         hidden: true
     },
     {
