@@ -35,6 +35,9 @@ public class UserController {
         if (user.getAuthCode() == null) {
             user.setAuthCode(1000L);
         }
+        if (user.getStatus() == null) {
+            user.setStatus(0);
+        }
         userService.registerUser(user);
         return ResponseEntity.custom(ResponseCodeEnum.SUCCESS.getCode(), "注册成功", null);
     }
@@ -54,7 +57,7 @@ public class UserController {
     @Operation(summary = "通过用户名查询用户", description = "返回与给定名称匹配的用户列表")
     @ApiResponse(responseCode = "200", description = "返回与给定名称匹配的用户列表")
     public ResponseEntity<List<User>> getUsersByName(
-            @Parameter(description = "用户名称", required = true) @PathVariable String name
+        @Parameter(description = "用户名称", required = true) @PathVariable String name
     ) {
         if (name == null || name.trim().isEmpty()) {
             throw new RuntimeException("Invalid user name");

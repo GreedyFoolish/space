@@ -2,6 +2,11 @@ server:
   port: 8080
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   profiles:
     # 开发环境
     active: dev
@@ -26,6 +31,9 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         show_sql: true
         format_sql: true
+        use-new-id-generator-mappings: false
+        jdbc:
+          time_zone: +08:00
   data:
     redis:
       url: redis://localhost:6379

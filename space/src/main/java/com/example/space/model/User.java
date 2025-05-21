@@ -15,12 +15,12 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "user", schema = "space")
-public class User {
+public class User extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @Schema(description = "用户ID", example = "1")
+    @Schema(description = "用户ID")
     private Long id;
 
     @Column(name = "name")
