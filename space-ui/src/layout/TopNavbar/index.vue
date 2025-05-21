@@ -12,7 +12,9 @@
 </template>
 
 <script setup>
+import { getRouterList } from "@/api/system/router.js"
 
+getRouterList()
 </script>
 
 <style scoped>
