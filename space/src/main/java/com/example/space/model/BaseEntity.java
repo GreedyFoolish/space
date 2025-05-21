@@ -52,11 +52,11 @@ public class BaseEntity {
     private Map<String, Object> params;
 
     /**
-     * 插入数据时的处理
+     * 数据库更新时，如果status为1，则将deleteTime设置为当前时间
      */
     @PreUpdate
     protected void onUpdate() {
-        if ("1".equals(status)) {
+        if (status != null && status.equals(1)) {
             deleteTime = new Date();
         }
     }
