@@ -26,7 +26,7 @@ public class SpaceRole extends BaseEntity {
     @Schema(description = "角色ID")
     private Long id;
 
-    @Column(name = "role_name", length = 32, columnDefinition = "varchar(32) comment '角色名称'")
+    @Column(name = "role_name", length = 64, columnDefinition = "varchar(64) comment '角色名称'")
     @Schema(description = "角色名称")
     private String roleName;
 

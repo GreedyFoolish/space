@@ -3,6 +3,7 @@ package com.example.space.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,13 +35,23 @@ public class SpaceNav extends BaseEntity {
     @Schema(description = "导航名称")
     private String navName;
 
-    @Column(name = "nav_url", length = 128, columnDefinition = "varchar(128) comment '导航跳转链接'")
+    @Column(name = "nav_url", length = 255, columnDefinition = "varchar(255) null comment '导航跳转链接'")
     @Schema(description = "导航跳转链接")
     private String navUrl;
 
-    @Column(name = "nav_icon", length = 255, columnDefinition = "varchar(255) comment '导航图标'")
+    @Column(name = "nav_icon", length = 255, columnDefinition = "varchar(255) null comment '导航图标'")
     @Schema(description = "导航图标")
     private String navIcon;
+
+    @Column(name = "nav_sort", columnDefinition = "int unsigned default 50 not null comment '导航链接的排序，数据越小排序越靠前'")
+    @Schema(description = "导航链接的排序，数据越小排序越靠前", example = "50")
+    private int navSort = 50;
+
+    /**
+     * 子导航列表
+     */
+    @OneToMany(mappedBy = "parentId", fetch = FetchType.LAZY)
+    private List<SpaceNav> children;
 
     /**
      * 关联角色权限表
