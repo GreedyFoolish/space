@@ -22,8 +22,8 @@ public class SpaceRoleRule extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "bigint unsigned not null comment '导航id'")
-    @Schema(description = "导航ID")
+    @Column(name = "id", columnDefinition = "bigint unsigned not null comment '主键id'")
+    @Schema(description = "主键ID")
     private Long id;
 
     @Schema(description = "角色ID")

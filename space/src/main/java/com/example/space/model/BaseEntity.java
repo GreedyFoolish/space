@@ -21,11 +21,11 @@ import java.util.Map;
 @Setter
 public class BaseEntity {
 
-    @Column(name = "create_by", columnDefinition = "bigint unsigned null comment '创建人'")
+    @Column(name = "create_by", columnDefinition = "bigint unsigned null comment '创建者'")
     @Schema(description = "创建者")
     private Long createBy;
 
-    @Column(name = "update_by", columnDefinition = "bigint unsigned null comment '更新人'")
+    @Column(name = "update_by", columnDefinition = "bigint unsigned null comment '更新者'")
     @Schema(description = "更新者")
     private Long updateBy;
 
@@ -33,7 +33,7 @@ public class BaseEntity {
     @Schema(description = "备注")
     private String remark;
 
-    @Column(name = "status", columnDefinition = "int default 0 not null comment '状态'")
+    @Column(name = "status", columnDefinition = "int default 0 not null comment '状态标志，0 正常 1 删除'")
     @Schema(description = "状态标志，0 正常 1 删除", example = "0")
     private Integer status = 0;
 
