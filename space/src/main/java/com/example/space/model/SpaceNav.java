@@ -22,11 +22,11 @@ public class SpaceNav extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "bigint comment '导航id'")
+    @Column(name = "id", columnDefinition = "bigint unsigned not null comment '导航id'")
     @Schema(description = "导航ID")
     private Long id;
 
-    @Column(name = "parent_id", columnDefinition = "bigint comment '父级导航id'")
+    @Column(name = "parent_id", columnDefinition = "bigint unsigned comment '父级导航id'")
     @Schema(description = "父级导航ID")
     private Long parentId;
 

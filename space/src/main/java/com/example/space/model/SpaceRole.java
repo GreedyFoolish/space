@@ -22,13 +22,17 @@ public class SpaceRole extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "bigint comment '角色id'")
+    @Column(name = "id", columnDefinition = "bigint unsigned not null comment '角色id'")
     @Schema(description = "角色ID")
     private Long id;
 
     @Column(name = "role_name", length = 32, columnDefinition = "varchar(32) comment '角色名称'")
     @Schema(description = "角色名称")
     private String roleName;
+
+    @Column(name = "auth_code", columnDefinition = "bigint comment '权限代码'")
+    @Schema(description = "权限代码")
+    private Long authCode;
 
     /**
      * 关联角色权限表
