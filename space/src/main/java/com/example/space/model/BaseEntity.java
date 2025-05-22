@@ -35,7 +35,7 @@ public class BaseEntity {
 
     @Column(name = "status", columnDefinition = "int default 0 not null comment '状态标志，0 正常 1 删除'")
     @Schema(description = "状态标志，0 正常 1 删除", example = "0")
-    private Integer status = 0;
+    private int status = 0;
 
     @CreatedDate
     @Column(name = "create_time", columnDefinition = "datetime default CURRENT_TIMESTAMP null comment '创建时间'")
@@ -60,7 +60,7 @@ public class BaseEntity {
      */
     @PreUpdate
     protected void onUpdate() {
-        if (status != null && status.equals(1)) {
+        if (status == 1) {
             deleteTime = new Date();
         }
     }

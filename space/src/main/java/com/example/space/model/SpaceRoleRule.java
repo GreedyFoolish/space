@@ -28,12 +28,12 @@ public class SpaceRoleRule extends BaseEntity {
 
     @Schema(description = "角色ID")
     @ManyToOne(optional = false)
-    @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false, foreignKey = @ForeignKey(name = "fk_role_id"))
+    @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false, foreignKey = @ForeignKey(name = "spaceRoleRule_spaceRole_id_fk"))
     private SpaceRole roleId;
 
     @Schema(description = "导航ID")
     @ManyToOne(optional = false)
-    @JoinColumn(name = "nav_id", referencedColumnName = "id", nullable = false, foreignKey = @ForeignKey(name = "fk_nav_id"))
+    @JoinColumn(name = "nav_id", referencedColumnName = "id", nullable = false, foreignKey = @ForeignKey(name = "spaceRoleRule_spaceNav_id_fk"))
     private SpaceNav navId;
 
 }
