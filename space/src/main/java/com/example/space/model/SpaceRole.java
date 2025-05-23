@@ -30,9 +30,9 @@ public class SpaceRole extends BaseEntity {
     @Schema(description = "角色名称")
     private String roleName;
 
-    @Column(name = "auth_code", columnDefinition = "bigint comment '权限编码'")
+    @Column(name = "auth_code", columnDefinition = "int default 1000 comment '权限编码'")
     @Schema(description = "权限编码")
-    private Long authCode;
+    private int authCode;
 
     /**
      * 关联角色权限表

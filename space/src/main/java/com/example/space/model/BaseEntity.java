@@ -33,8 +33,8 @@ public class BaseEntity {
     @Schema(description = "备注")
     private String remark;
 
-    @Column(name = "status", columnDefinition = "int default 0 not null comment '状态标志，0 正常 1 删除'")
-    @Schema(description = "状态标志，0 正常 1 删除", example = "0")
+    @Column(name = "status", columnDefinition = "int default 0 not null comment '状态标志，0-正常，1-删除。默认值为0'")
+    @Schema(description = "状态标志，0-正常，1-删除。默认值为0", example = "0")
     private int status = 0;
 
     @CreatedDate

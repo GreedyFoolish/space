@@ -35,16 +35,16 @@ public class SpaceNav extends BaseEntity {
     @Schema(description = "导航名称")
     private String navName;
 
-    @Column(name = "nav_url", length = 255, columnDefinition = "varchar(255) null comment '导航跳转链接'")
-    @Schema(description = "导航跳转链接")
+    @Column(name = "nav_url", length = 255, columnDefinition = "varchar(255) null comment '导航路由'")
+    @Schema(description = "导航路由")
     private String navUrl;
 
     @Column(name = "nav_icon", length = 255, columnDefinition = "varchar(255) null comment '导航图标'")
     @Schema(description = "导航图标")
     private String navIcon;
 
-    @Column(name = "nav_sort", columnDefinition = "int unsigned default 50 not null comment '导航链接的排序，数据越小排序越靠前'")
-    @Schema(description = "导航链接的排序，数据越小排序越靠前", example = "50")
+    @Column(name = "nav_sort", columnDefinition = "int unsigned not null default 50 comment '导航排序，数值越小越靠前。默认值为50'")
+    @Schema(description = "导航排序，数值越小越靠前。默认值为50")
     private int navSort = 50;
 
     /**
