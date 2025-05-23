@@ -1,4 +1,4 @@
-package com.example.space.service;
+package com.example.space.service.impl;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -6,10 +6,15 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import com.example.space.service.CaptchaGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CaptchaGeneratorImpl implements CaptchaGenerator {
+    // 日志记录器
+    private static final Logger logger = LoggerFactory.getLogger(CaptchaGeneratorImpl.class);
 
     @Override
     public String generateRandomCaptcha() {
@@ -19,6 +24,7 @@ public class CaptchaGeneratorImpl implements CaptchaGenerator {
         for (int i = 0; i < length; i++) {
             sb.append(chars.charAt((int) (Math.random() * chars.length())));
         }
+        logger.info("生成的验证码: {}", sb.toString());
         return sb.toString();
     }
 
@@ -47,8 +53,9 @@ public class CaptchaGeneratorImpl implements CaptchaGenerator {
         g.setFont(new Font("Times New Roman", Font.PLAIN, 24));
         g.setColor(getRandColor(160, 200));
         g.drawString(text, 10, 25);
-
+        // 释放图形上下文
         g.dispose();
+        logger.info("生成的验证码图片: {}", image);
         return image;
     }
 
