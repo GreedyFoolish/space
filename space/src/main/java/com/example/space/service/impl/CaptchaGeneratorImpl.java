@@ -24,7 +24,7 @@ public class CaptchaGeneratorImpl implements CaptchaGenerator {
         for (int i = 0; i < length; i++) {
             sb.append(chars.charAt((int) (Math.random() * chars.length())));
         }
-        logger.info("生成的验证码: {}", sb.toString());
+        logger.info("生成的验证码：{}", sb.toString());
         return sb.toString();
     }
 
@@ -55,7 +55,7 @@ public class CaptchaGeneratorImpl implements CaptchaGenerator {
         g.drawString(text, 10, 25);
         // 释放图形上下文
         g.dispose();
-        logger.info("生成的验证码图片: {}", image);
+        logger.info("生成的验证码图片：{}", image);
         return image;
     }
 

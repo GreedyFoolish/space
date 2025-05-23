@@ -41,6 +41,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     @Override
     public void saveCaptcha(String key, String captcha) {
         redisTemplate.opsForValue().set("captcha:" + key, captcha, captchaProperties.getExpiration(), TimeUnit.MINUTES);
+        logger.info("验证码已保存到 Redis，Key：{}，Captcha：{}", key, captcha);
     }
 
     @Override
@@ -49,6 +50,7 @@ public class CaptchaServiceImpl implements CaptchaService {
             return false;
         }
         String captcha = redisTemplate.opsForValue().get("captcha:" + key);
+        logger.info("验证码已从 Redis 中获取，Key：{}，Captcha：{}", key, captcha);
         return captcha != null && captcha.equalsIgnoreCase(inputCaptcha);
     }
 
