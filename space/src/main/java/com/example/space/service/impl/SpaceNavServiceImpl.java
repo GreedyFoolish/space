@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class SpaceNavServiceImpl implements SpaceNavService {
     // 日志记录器
     private static final Logger logger = LoggerFactory.getLogger(SpaceNavServiceImpl.class);
-    // 注入SpaceNavRepository，用于查询导航数据
+    // 导航栏数据访问对象
     private final SpaceNavRepository spaceNavRepository;
 
     public SpaceNavServiceImpl(SpaceNavRepository spaceNavRepository) {

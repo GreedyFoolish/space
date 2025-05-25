@@ -4,15 +4,15 @@ import lombok.Getter;
 
 @Getter
 public enum RoleEnum {
-    ANONYMOUS("ROLE_ANONYMOUS", 0L), // 匿名用户
-    USER("ROLE_USER", 1000L), // 普通用户
-    ADMIN("ROLE_ADMIN", 2000L), // 管理员
-    SUPER_ADMIN("ROLE_SUPER_ADMIN", 3000L); // 超级管理员
+    ANONYMOUS("ROLE_ANONYMOUS", 0), // 匿名用户
+    USER("ROLE_USER", 1000), // 普通用户
+    ADMIN("ROLE_ADMIN", 2000), // 管理员
+    SUPER_ADMIN("ROLE_SUPER_ADMIN", 3000); // 超级管理员
 
     private final String authority;
-    private final Long authCode;
+    private final int authCode;
 
-    RoleEnum(String authority, Long authCode) {
+    RoleEnum(String authority, int authCode) {
         this.authority = authority;
         this.authCode = authCode;
     }
@@ -23,9 +23,9 @@ public enum RoleEnum {
      * @param code 权限代码
      * @return 枚举值
      */
-    public static RoleEnum fromAuthCode(Long code) {
+    public static RoleEnum fromAuthCode(int code) {
         for (RoleEnum role : values()) {
-            if (role.getAuthCode().equals(code)) {
+            if (role.getAuthCode() == code) {
                 return role;
             }
         }

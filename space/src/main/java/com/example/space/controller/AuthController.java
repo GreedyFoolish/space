@@ -3,7 +3,7 @@ package com.example.space.controller;
 import com.example.space.enums.ResponseCodeEnum;
 import com.example.space.exception.BusinessException;
 import com.example.space.model.ResponseEntity;
-import com.example.space.model.User;
+import com.example.space.model.SpaceUser;
 import com.example.space.service.CaptchaService;
 import com.example.space.util.JwtUtil;
 import com.example.space.util.ResponseUtil;
@@ -51,7 +51,7 @@ public class AuthController {
     @Operation(summary = "用户登录", description = "通过用户名和密码获取 JWT")
     @ApiResponse(responseCode = "200", description = "成功返回 JWT")
     public ResponseEntity<Map<String, String>> login(
-        @Valid @Parameter(description = "用户信息") @RequestBody User user,
+        @Valid @Parameter(description = "用户信息") @RequestBody SpaceUser user,
         @Parameter(description = "验证码的key") @RequestHeader("X-Captcha-Key") String captchaKey,
         @Parameter(description = "验证码的value") @RequestHeader("X-Captcha-Code") String captcha
     ) {
@@ -61,7 +61,7 @@ public class AuthController {
         }
         // 进行身份验证
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(user.getName(), user.getPassword())
+            new UsernamePasswordAuthenticationToken(user.getUserName(), user.getUserPassword())
         );
         // 如果认证成功，设置 SecurityContext
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -69,8 +69,9 @@ public class AuthController {
         String role = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.joining(","));
+        logger.info("用户 {} 登录成功，角色权限为 {}", user.getUserName(), role);
         // 生成 JWT 令牌
-        String token = jwtUtil.generateToken(user.getName(), role);
+        String token = jwtUtil.generateToken(user.getUserName(), role);
         // 返回包含令牌的响应
         Map<String, String> response = new HashMap<>();
         response.put("token", token);

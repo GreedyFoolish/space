@@ -3,7 +3,7 @@ package com.example.space.config;
 import com.example.space.entrypoint.JwtAuthenticationEntryPoint;
 import com.example.space.enums.RoleEnum;
 import com.example.space.handler.CustomAccessDeniedHandler;
-import com.example.space.service.UserService;
+import com.example.space.service.SpaceUserService;
 import com.example.space.util.JwtUtil;
 import com.example.space.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +15,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -27,7 +25,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
-    private final UserService userService;
+    private final SpaceUserService spaceUserService;
     private final SecurityProperties securityProperties;
     private final Environment environment;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -40,13 +38,13 @@ public class SecurityConfig {
     };
 
     public SecurityConfig(JwtUtil jwtUtil,
-                          UserService userService,
+                          SpaceUserService spaceUserService,
                           SecurityProperties securityProperties,
                           Environment environment,
                           CustomAccessDeniedHandler customAccessDeniedHandler,
                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
         this.jwtUtil = jwtUtil;
-        this.userService = userService;
+        this.spaceUserService = spaceUserService;
         this.securityProperties = securityProperties;
         this.environment = environment;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
@@ -84,7 +82,7 @@ public class SecurityConfig {
                     ex.authenticationEntryPoint(jwtAuthenticationEntryPoint) // 认证失败处理器
                         .accessDeniedHandler(customAccessDeniedHandler) // 权限不足处理器
             )
-            .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService, securityProperties, environment), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, spaceUserService, securityProperties, environment), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -100,16 +98,6 @@ public class SecurityConfig {
         filter.setEncoding("UTF-8");
         filter.setForceEncoding(true);
         return filter;
-    }
-
-    /**
-     * 密码加密器
-     *
-     * @return 密码加密器
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     /**

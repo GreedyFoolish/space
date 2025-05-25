@@ -36,9 +36,9 @@ public class SpaceUser extends BaseEntity {
     @Schema(description = "用户名")
     private String userName;
 
-    @Column(name = "user_passwd", length = 255, columnDefinition = "varchar(255) comment '用户密码'")
+    @Column(name = "user_password", length = 255, columnDefinition = "varchar(255) comment '用户密码'")
     @Schema(description = "用户密码")
-    private String userPasswd;
+    private String userPassword;
 
     @Column(name = "user_last_time", columnDefinition = "datetime null comment '上一次登录时间'")
     @Schema(description = "上一次登录时间")

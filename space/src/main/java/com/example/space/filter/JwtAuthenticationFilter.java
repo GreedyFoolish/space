@@ -2,7 +2,7 @@ package com.example.space.filter;
 
 import com.example.space.config.SecurityProperties;
 import com.example.space.enums.RoleEnum;
-import com.example.space.service.UserService;
+import com.example.space.service.SpaceUserService;
 import com.example.space.util.JwtUtil;
 import com.example.space.util.WebUtils;
 import io.jsonwebtoken.JwtException;
@@ -17,22 +17,23 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserService userService;
+    private final SpaceUserService spaceUserService;
     private final SecurityProperties securityProperties;
     private final Environment environment;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserService userService, SecurityProperties securityProperties, Environment environment) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil,
+                                   SpaceUserService spaceUserService,
+                                   SecurityProperties securityProperties,
+                                   Environment environment) {
         this.jwtUtil = jwtUtil;
-        this.userService = userService;
+        this.spaceUserService = spaceUserService;
         this.securityProperties = securityProperties;
         this.environment = environment;
     }
@@ -65,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 解析 token 获取用户名
             String username = jwtUtil.getUsernameFromToken(token);
             // 根据用户名获取用户详情（角色等信息）
-            UserDetails userDetails = userService.loadUserByUsername(username);
+            UserDetails userDetails = spaceUserService.loadUserByUsername(username);
             // 创建认证对象
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities()

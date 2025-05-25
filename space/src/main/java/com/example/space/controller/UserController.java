@@ -1,9 +1,10 @@
 package com.example.space.controller;
 
+import com.example.space.dto.SpaceUserDTO;
 import com.example.space.enums.ResponseCodeEnum;
 import com.example.space.model.ResponseEntity;
-import com.example.space.model.User;
-import com.example.space.service.UserService;
+import com.example.space.model.SpaceUser;
+import com.example.space.service.SpaceUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,33 +23,27 @@ import java.util.List;
 @RequestMapping("/api/user")
 @Tag(name = "用户管理", description = "用户相关操作接口")
 public class UserController {
-    private final UserService userService;
+    private final SpaceUserService spaceUserService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(SpaceUserService spaceUserService) {
+        this.spaceUserService = spaceUserService;
     }
 
     @PostMapping("/register")
     @Operation(summary = "用户注册", description = "")
     @ApiResponse(responseCode = "200", description = "")
-    public ResponseEntity<String> register(@Parameter(description = "用户信息") @Valid @RequestBody User user) {
-        if (user.getAuthCode() == null) {
-            user.setAuthCode(1000L);
-        }
-        if (user.getStatus() == null) {
-            user.setStatus(0);
-        }
-        userService.registerUser(user);
+    public ResponseEntity<String> register(@Parameter(description = "用户信息") @Valid @RequestBody SpaceUser user) {
+        spaceUserService.registerUser(user);
         return ResponseEntity.custom(ResponseCodeEnum.SUCCESS.getCode(), "注册成功", null);
     }
 
     @GetMapping(value = "/all", produces = "application/json")
     @Operation(summary = "查询所有用户", description = "获取用户列表")
     @ApiResponse(responseCode = "200", description = "返回所有用户列表")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
+    public ResponseEntity<List<SpaceUserDTO>> getAllUsers() {
+        List<SpaceUserDTO> users = spaceUserService.getAllUsers();
         if (users.isEmpty()) {
-            throw new RuntimeException("No users found");
+            throw new RuntimeException("未找到用户");
         }
         return ResponseEntity.success(users);
     }
@@ -56,15 +51,15 @@ public class UserController {
     @GetMapping(value = "/{name}", produces = "application/json")
     @Operation(summary = "通过用户名查询用户", description = "返回与给定名称匹配的用户列表")
     @ApiResponse(responseCode = "200", description = "返回与给定名称匹配的用户列表")
-    public ResponseEntity<List<User>> getUsersByName(
+    public ResponseEntity<List<SpaceUserDTO>> getUsersByName(
         @Parameter(description = "用户名称", required = true) @PathVariable String name
     ) {
         if (name == null || name.trim().isEmpty()) {
-            throw new RuntimeException("Invalid user name");
+            throw new RuntimeException("无可用用户名");
         }
-        List<User> users = userService.getUsersByName(name);
+        List<SpaceUserDTO> users = spaceUserService.getUsersByName(name);
         if (users.isEmpty()) {
-            throw new RuntimeException("No users found with name: " + name);
+            throw new RuntimeException("未找到与用户名匹配的用户: " + name);
         }
         return ResponseEntity.success(users);
     }
