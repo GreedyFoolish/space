@@ -23,7 +23,7 @@ CREATE TABLE `space_user`
     `id`             BIGINT UNSIGNED AUTO_INCREMENT COMMENT '用户id',
     `role_id`        BIGINT UNSIGNED                    NULL COMMENT '角色id',
     `user_name`      VARCHAR(64)                        NULL COMMENT '用户名',
-    `user_passwd`    VARCHAR(255)                       NULL COMMENT '用户密码',
+    `user_password`  VARCHAR(255)                       NULL COMMENT '用户密码',
     `user_last_time` DATETIME                           NULL COMMENT '上一次登录时间',
     `create_by`      BIGINT UNSIGNED                    NULL COMMENT '创建者',
     `update_by`      BIGINT UNSIGNED                    NULL COMMENT '更新者',
