@@ -3,8 +3,8 @@
         <h2>注册</h2>
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" label-width="auto" status-icon
                  style="max-width: 600px">
-            <el-form-item label="用户名" prop="name">
-                <el-input v-model.number="ruleForm.name"/>
+            <el-form-item label="用户名" prop="userName">
+                <el-input v-model.number="ruleForm.userName"/>
             </el-form-item>
             <el-form-item label="密码" prop="password">
                 <el-input v-model="ruleForm.password" autocomplete="off" type="password"/>
@@ -50,6 +50,10 @@ const validatePass = (rule, value, callback) => {
     if (value === "") {
         callback(new Error("请输入密码"))
     } else {
+        if (ruleForm.userName !== "") {
+            if (!ruleFormRef.value) return
+            ruleFormRef.value.validateField("userName")
+        }
         if (ruleForm.checkPass !== "") {
             if (!ruleFormRef.value) {
                 return
@@ -71,13 +75,13 @@ const confirmPass = (rule, value, callback) => {
 }
 
 const ruleForm = reactive({
-    name: "",
+    userName: "",
     password: "",
     checkPass: "",
 })
 
 const rules = reactive({
-    name: [{validator: validateName, trigger: "blur"}],
+    userName: [{validator: validateName, trigger: "blur"}],
     password: [{validator: validatePass, trigger: "blur"}],
     checkPass: [{validator: confirmPass, trigger: "blur"}]
 })
@@ -112,7 +116,7 @@ const submitForm = async (formEl) => {
     formEl.validate(async valid => {
         if (valid) {
             const hashPassword = await sha256(ruleForm.password)
-            register({...ruleForm, password: hashPassword}).then(res => {
+            register({...ruleForm, userPassword: hashPassword}).then(res => {
                 if (res.code === 200) {
                     const token = res.data?.token
                     if (!token) {
