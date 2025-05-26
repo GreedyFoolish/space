@@ -25,15 +25,28 @@ public class SpaceNavTreeDTO {
     @Schema(description = "导航图标")
     private String navIcon;
 
+    @Schema(description = "导航类型")
+    private String navType;
+
+    @Schema(description = "导航组件")
+    private String navComponent;
+
+    @Schema(description = "导航排序")
+    private int navSort;
+
     @Schema(description = "子导航信息")
     private List<SpaceNavTreeDTO> children;
 
-    public SpaceNavTreeDTO(Long id, Long parentId, String navName, String navUrl, String navIcon) {
+    public SpaceNavTreeDTO(Long id, Long parentId, String navName, String navUrl, String navIcon,
+                           String navType, String navComponent, int navSort) {
         this.id = id;
         this.parentId = parentId;
         this.navName = navName;
         this.navUrl = navUrl;
         this.navIcon = navIcon;
+        this.navType = navType;
+        this.navComponent = navComponent;
+        this.navSort = navSort;
     }
 
 }

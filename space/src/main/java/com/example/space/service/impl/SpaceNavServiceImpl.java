@@ -44,6 +44,7 @@ public class SpaceNavServiceImpl implements SpaceNavService {
             // 构建导航树
             List<SpaceNavTreeDTO> rootNodes = allNavs.stream()
                 .filter(nav -> nav.getParentId() == null || nav.getParentId() == 0)
+                .sorted((o1, o2) -> Integer.compare(o1.getNavSort(), o2.getNavSort()))
                 .peek(nav -> buildChildren(nav, parentToChildren))
                 .collect(Collectors.toList());
             logger.info("获取用户导航树成功");
@@ -56,6 +57,7 @@ public class SpaceNavServiceImpl implements SpaceNavService {
 
     private void buildChildren(SpaceNavTreeDTO parent, Map<Long, List<SpaceNavTreeDTO>> parentToChildren) {
         List<SpaceNavTreeDTO> children = parentToChildren.getOrDefault(parent.getId(), Collections.emptyList());
+        children.sort((o1, o2) -> Integer.compare(o1.getNavSort(), o2.getNavSort()));
         parent.setChildren(children);
         children.forEach(child -> buildChildren(child, parentToChildren));
     }
