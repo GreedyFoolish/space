@@ -16,23 +16,28 @@ const loadView = view => () => import(/* @vite-ignore */ `@/views/${view}`)
 
 export const usePermissionStore = defineStore("permission", {
     state: () => ({
-        routes: []
+        routes: [],
+        topNavbarRoutes: []
     }),
     actions: {
         generateRouteList() {
             return new Promise(resolve => {
                 try {
                     getRouterList().then(res => {
-                        // 重写路由
-                        const rewriteRoutes = filterAsyncRouter(res.data, false, true)
+                        const routeList = JSON.parse(JSON.stringify(res.data))
+                        // 拼接子路由
+                        const concatenateRoutes = filterAsyncRouter(res.data, true)
+                        // 过滤侧边栏路由
+                        const topNavbarRoutes = filterAsyncRouter(routeList)
                         // 过滤动态路由
                         const asyncRoutes = filterDynamicRoutes(dynamicRoutes)
                         // 添加 404 路由
-                        rewriteRoutes.push({path: "*", redirect: "/404", hidden: true})
+                        concatenateRoutes.push({ path: "*", redirect: "/404", hidden: true })
                         // 添加动态路由
                         asyncRoutes.forEach(route => router.addRoute(route))
                         // 设置最终路由
-                        this.routes = constantRoutes.concat(rewriteRoutes)
+                        this.routes = constantRoutes.concat(concatenateRoutes)
+                        this.topNavbarRoutes = topNavbarRoutes
                         resolve(this.routes)
                     })
                 } catch (error) {
@@ -44,32 +49,33 @@ export const usePermissionStore = defineStore("permission", {
 })
 
 // 递归过滤异步路由表，返回符合用户角色权限的路由表
-function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
+function filterAsyncRouter(asyncRouterMap, concatenate = false) {
     return asyncRouterMap.filter(route => {
         if (!checkPermission(route)) {
             return false
         }
-
-        if (type && route.children) {
-            route.children = filterChildren(route.children)
-        }
-
-        if (route.component) {
-            if (componentMap[route.component]) {
-                route.component = componentMap[route.component]
+        // 组件映射
+        const component = route.navComponent
+        if (component) {
+            if (componentMap[component]) {
+                route.component = componentMap[component]
             } else {
-                route.component = loadView(route.component)
+                route.component = loadView(component)
             }
         }
-
+        // 递归过滤子路由
         if (route.children?.length > 0) {
-            route.children = filterAsyncRouter(route.children, route, type)
+            // 拼接子路由
+            if (concatenate) {
+                route.children = filterChildren(route.children, route)
+            }
+            route.children = filterAsyncRouter(route.children, concatenate)
         } else {
             delete route["children"]
             delete route["redirect"]
         }
 
-        return true
+        return route
     })
 }
 
@@ -79,22 +85,23 @@ function checkPermission(route) {
 }
 
 // 子路由路径拼接
-function filterChildren(childrenMap) {
+function filterChildren(childrenMap, parentRouter) {
     const children = []
-    childrenMap.forEach(el => {
-        el.path = normalizePath(el.path) // 避免路径重复
-        if (el.children && el.children.length && el.component === "ParentView") {
-            children.push(...filterChildren(el.children))
-        } else {
-            children.push(el)
+    childrenMap.forEach(item => {
+        // 路径去重
+        item.navUrl = normalizePath(item.navUrl)
+        if (parentRouter) {
+            item.navUrl = parentRouter.navUrl + "/" + item.navUrl
         }
+        children.push(item)
     })
     return children
 }
 
 // 路径规范化处理
 function normalizePath(path) {
-    return path.replace(/\/+/g, "/")
+    // 路径去重。去除路由中的斜杠
+    return path.replace(/\/+/g, "")
 }
 
 // 动态路由过滤
