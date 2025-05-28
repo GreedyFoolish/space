@@ -1,22 +1,28 @@
-import {defineStore} from "pinia"
-import {getToken, removeToken, setToken} from "@/utils/auth.js"
+import { defineStore } from "pinia"
+import { usePermissionStore } from "@/stores/permissionStore.js"
+import { getToken, removeToken, setToken } from "@/utils/auth.js"
 
 export const useUserStore = defineStore("user", {
     state: () => ({
         token: getToken(),
-        name: "",
-        roles: []
+        roles: [],
+        name: "root",
+        avatar: "../../assets/img/user/avatar.jpg"
     }),
     getters: {
         getToken: (state) => state.token,
-        getRoles: (state) => state.roles
+        getRoles: (state) => state.roles,
+        getName: (state) => state.name,
+        getAvatar: (state) => state.avatar
     },
     actions: {
         login(token) {
             return new Promise((resolve, reject) => {
                 this.token = token
                 setToken(token)
-                resolve()
+                usePermissionStore().generateRouteList().then(() => {
+                    resolve()
+                })
             })
         },
         logout() {
