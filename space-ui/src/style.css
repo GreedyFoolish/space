@@ -1,8 +1,34 @@
 * {
     margin: 0;
     padding: 0;
+    outline: transparent;
 }
 
 #app {
     max-height: 100vh;
+}
+
+/* 全局变量 */
+:root {
+    /* 顶部导航栏 */
+    --top-navbar-height: 50px;
+    /* 顶部导航栏logo */
+    --top-navbar-logo-width: 120px;
+    --top-navbar-logo-margin-left: 20px;
+    --top-navbar-logo-font-size: 20px;
+    --top-navbar-logo-color: #cc8f14;
+    --top-navbar-logo-text-margin-left: 6px;
+    /* 顶部导航栏菜单 */
+    --top-navbar-menu-item-width: 100px;
+    --top-navbar-menu-item-font-size: 16px;
+    --top-navbar-menu-item-default-color: #303133;
+    --top-navbar-menu-item-active-color: #409eff;
+    --top-navbar-menu-more-icon-margin-left: 6px;
+    /* 顶部导航栏用户 */
+    --top-navbar-user-width: 180px;
+    --top-navbar-user-font-size: 16px;
+    --top-navbar-user-avatar-width: 30px;
+    --top-navbar-user-avatar-height: 30px;
+    --top-navbar-user-name-margin-left: 6px;
+    --top-navbar-user-name-margin-right: 18px;
 }
