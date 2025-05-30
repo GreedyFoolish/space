@@ -30,7 +30,8 @@
                     <el-dropdown-menu>
                         <el-dropdown-item
                             v-for="(item, index) in topMenu.filter((_, index) => index >= visibleNumber)"
-                            :key="`dropdown-menu-${item.id ||index}`"
+                            :key="`dropdown-menu-${item.id ||index}`" @click="activeMenu(item)"
+                            :class="{ 'active': currentMenu === item.navUrl }"
                         >
                             {{ item.navName }}
                         </el-dropdown-item>
@@ -135,7 +136,10 @@ onBeforeUnmount(() => {
 <style scoped>
 .top-navbar-wrapper {
     width: 100%;
+    height: var(--top-navbar-height);
     display: flex;
+    box-shadow: var(--top-navbar-box-shadow);
+    z-index: var(--top-navbar-z-index);
 
     .top-navbar-logo {
         width: var(--top-navbar-logo-width);
