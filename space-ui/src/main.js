@@ -2,7 +2,7 @@ import {createPinia} from "pinia"
 import {createApp} from "vue"
 import "./style.css"
 import "./permission.js"
-import mountIcons from '@/mountIcons.js'
+import mountIcons from "@/mountIcons.js"
 import router from "@/router/index.js"
 import App from "./App.vue"
 
