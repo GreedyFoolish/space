@@ -1,7 +1,15 @@
 * {
     margin: 0;
     padding: 0;
-    outline: transparent;
+    outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
 }
 
 #app {
@@ -12,6 +20,8 @@
 :root {
     /* 顶部导航栏 */
     --top-navbar-height: 50px;
+    --top-navbar-box-shadow: 0 1px 2px #c7c8c9;
+    --top-navbar-z-index: 1;
     /* 顶部导航栏logo */
     --top-navbar-logo-width: 120px;
     --top-navbar-logo-margin-left: 20px;
@@ -31,4 +41,7 @@
     --top-navbar-user-avatar-height: 30px;
     --top-navbar-user-name-margin-left: 6px;
     --top-navbar-user-name-margin-right: 18px;
+    /* 侧边栏 */
+    --sidebar-container-background-color: #ffffff;
+    --sidebar-container-transition: width 0.28s;
 }
