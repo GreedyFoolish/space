@@ -1,7 +1,11 @@
 <template>
     <el-scrollbar>
         <el-menu mode="vertical">
-            <SidebarItem v-for="(item, index) in topMenu" :key="`menu-item-${item.id ||index}`" :item="item">
+            <SidebarItem v-for="(item, index) in topMenu"
+                         :key="`menu-item-${item.id ||index}`"
+                         :item="item"
+                         :basePath="basePath"
+            >
             </SidebarItem>
         </el-menu>
     </el-scrollbar>
@@ -18,6 +22,7 @@ const permissionStore = usePermissionStore()
 const topMenu = computed(() => {
     return permissionStore.topNavbarRoutes
 })
+const basePath = ref("/")
 </script>
 
 <style scoped>

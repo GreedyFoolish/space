@@ -2,7 +2,7 @@
     <template v-if="showChild(item)">
         <SidebarLink :to="resolvePath(onlyOneChildren.navUrl, onlyOneChildren.query)">
             <el-menu-item :index="resolvePath(onlyOneChildren.navUrl)">
-                <SidebarText :title="item.navName">{{ item.navName }}</SidebarText>
+                <SidebarText :title="onlyOneChildren.navName"></SidebarText>
             </el-menu-item>
         </SidebarLink>
     </template>
@@ -14,7 +14,7 @@
             <SidebarItem v-for="child in item.children"
                          :key="child.navUrl"
                          :item="child"
-                         :basePath="resolvePath(child.navUrl)"
+                         :basePath="resolvePath(item.navUrl)"
             >
             </SidebarItem>
         </el-sub-menu>
@@ -22,7 +22,6 @@
 </template>
 
 <script setup>
-import path from "path"
 import { ref } from "vue"
 import SidebarLink from "@/layout/Sidebar/SidebarLink.vue"
 import SidebarText from "@/layout/Sidebar/SidebarText.vue"
@@ -63,29 +62,56 @@ const hasOneShowChildren = (children = [], parent) => {
     }
     // 如果没有要显示的子路由，则显示父路由
     if (showingChildren.length === 0) {
-        onlyOneChildren.value = { ...parent, navUrl: "", noShowChildren: true }
+        onlyOneChildren.value = { ...parent, noShowChildren: true }
         return true
     }
     // 如果有多个子路由，则不显示
     return false
 }
 
+const customResolvePath = (basePath, routePath) => {
+    // 去掉父路由路径和子路由路径中的 /
+    const safeBase = basePath ? basePath.replace(/\/+$/, "") : ""
+    const safeRoute = routePath ? routePath.replace(/^\/+/, "") : ""
+    // 如果任意一个为空，则直接返回另一个
+    if (!safeBase || !safeRoute) {
+        return safeBase || safeRoute
+    }
+    // 返回拼接后的路径
+    return `${safeBase}/${safeRoute}`
+}
+
 const resolvePath = (routePath, routeQuery = null) => {
-    if (routePath) {
-        if (isExternal(routePath)) {
-            return routePath
-        }
-        if (props.basePath && isExternal(props.basePath)) {
-            return props.basePath
-        }
-        if (routeQuery != null) {
-            let query = JSON.parse(routeQuery)
-            return { path: path.resolve(props.basePath, routePath), query: query }
-        }
-        return path.resolve(routePath)
-    } else {
+    if (!routePath) {
+        console.error("无效的路由路径：", routePath)
+        return ""
+    }
+    // 如果路由路径是一个外部链接，则直接返回路由路径
+    if (isExternal(routePath)) {
         return routePath
     }
+    // 如果父路由路径是一个外部链接，则直接返回父路由路径
+    if (props.basePath && isExternal(props.basePath)) {
+        return props.basePath
+    }
+    // 解析路由查询参数
+    let query = {}
+    // 如果路由查询参数是一个字符串，则尝试解析为对象
+    if (typeof routeQuery === "string") {
+        try {
+            query = JSON.parse(routeQuery)
+        } catch (e) {
+            console.warn("无效的路由查询参数：", routeQuery, e)
+            query = {}
+        }
+    } else if (routeQuery !== null && typeof routeQuery !== "object") {
+        console.warn("routeQuery 类型应为字符串或 null：", routeQuery)
+        query = {}
+    }
+    // 返回拼接后的路径
+    const resolvedPath = customResolvePath(props.basePath, routePath)
+    // 返回拼接后的路径和查询参数
+    return routeQuery != null ? { path: resolvedPath, query } : resolvedPath
 }
 </script>
 
