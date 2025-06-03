@@ -1,5 +1,5 @@
 <template>
-    <component :is="linkType(to)" :to="linkProps(to)">
+    <component :is="linkType(to)" v-bind="linkProps(to)">
         <slot></slot>
     </component>
 </template>
@@ -24,14 +24,16 @@ const linkType = (to = props.to) => {
 
 const linkProps = (to = props.to) => {
     if (isExternal(to)) {
+        // 如果是外部链接，则返回a标签
         return {
             href: to,
             target: "_blank",
             rel: "noopener"
         }
     }
+    // 如果是内部链接，则返回router-link标签
     return {
-        to: to
+        to: "/" + to
     }
 }
 </script>
