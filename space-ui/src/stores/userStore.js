@@ -16,10 +16,11 @@ export const useUserStore = defineStore("user", {
         getAvatar: (state) => state.avatar
     },
     actions: {
-        login(token) {
+        login(token, role) {
             return new Promise((resolve, reject) => {
                 this.token = token
                 setToken(token)
+                this.roles = role
                 usePermissionStore().generateRouteList().then(() => {
                     resolve()
                 })
