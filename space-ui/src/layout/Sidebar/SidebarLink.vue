@@ -31,9 +31,10 @@ const linkProps = (to = props.to) => {
             rel: "noopener"
         }
     }
+    const normalizedPath = to.startsWith("/") ? to : "/" + to
     // 如果是内部链接，则返回router-link标签
     return {
-        to: "/" + to
+        to: normalizedPath
     }
 }
 </script>

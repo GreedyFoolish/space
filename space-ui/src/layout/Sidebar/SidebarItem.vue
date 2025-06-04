@@ -70,15 +70,16 @@ const hasOneShowChildren = (children = [], parent) => {
 }
 
 const customResolvePath = (basePath, routePath) => {
-    // 去掉父路由路径和子路由路径中的 /
-    const safeBase = basePath ? basePath.replace(/\/+$/, "") : ""
+    // 去掉父路由开头和末尾的所有斜杠 /
+    const safeBase = basePath ? basePath.replace(/^\/+|\/+$/g, "") : ""
+    // 去掉子路由开头的所有斜杠 /
     const safeRoute = routePath ? routePath.replace(/^\/+/, "") : ""
     // 如果任意一个为空，则直接返回另一个
     if (!safeBase || !safeRoute) {
         return safeBase || safeRoute
     }
     // 返回拼接后的路径
-    return `${safeBase}/${safeRoute}`
+    return `/${safeBase}/${safeRoute}`
 }
 
 const resolvePath = (routePath, routeQuery = null) => {
