@@ -75,6 +75,7 @@ public class AuthController {
         // 返回包含令牌的响应
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
+        response.put("role", role);
         return ResponseEntity.success(response);
     }
 
