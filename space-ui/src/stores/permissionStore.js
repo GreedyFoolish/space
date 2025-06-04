@@ -1,5 +1,5 @@
-import {defineStore} from "pinia"
-import {getRouterList} from "@/api/system/router.js"
+import { defineStore } from "pinia"
+import { getRouterList } from "@/api/system/router.js"
 import InnerLink from "@/layout/InnerLink.vue"
 import ParentView from "@/layout/ParentView.vue"
 import Layout from "@/layout/index.vue"

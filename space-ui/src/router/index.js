@@ -4,7 +4,7 @@ import {createRouter, createWebHistory} from "vue-router"
 export const constantRoutes = [
     {
         path: "/",
-        redirect: "/login"
+        redirect: "/home"
     },
     {
         path: "/login",

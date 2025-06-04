@@ -1,5 +1,5 @@
-import {createPinia} from "pinia"
-import {createApp} from "vue"
+import { createPinia } from "pinia"
+import { createApp } from "vue"
 import "./style.css"
 import "./permission.js"
 import mountIcons from "@/mountIcons.js"
