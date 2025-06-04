@@ -68,4 +68,12 @@ const handleClickOutSide = () => {
         }
     }
 }
+
+:deep(.el-scrollbar__view) {
+    height: 100%;
+
+    .el-menu {
+        height: 100%;
+    }
+}
 </style>
