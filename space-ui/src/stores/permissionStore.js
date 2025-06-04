@@ -3,7 +3,10 @@ import { getRouterList } from "@/api/system/router.js"
 import InnerLink from "@/layout/InnerLink.vue"
 import ParentView from "@/layout/ParentView.vue"
 import Layout from "@/layout/index.vue"
-import router, {constantRoutes, dynamicRoutes} from "@/router"
+import router, { constantRoutes, dynamicRoutes } from "@/router"
+
+// 获取所有 views 下的 vue 文件
+const views = import.meta.glob("@/views/**/*.vue")
 
 const componentMap = {
     Layout,
@@ -12,7 +15,17 @@ const componentMap = {
 }
 
 // 加载路由组件
-const loadView = view => () => import(/* @vite-ignore */ `@/views/${view}`)
+const loadView = (componentName) => {
+    const path = `/src/views/${componentName}`
+    const key = Object.keys(views).find(key => key === path)
+
+    if (key) {
+        return views[key]
+    } else {
+        console.warn(`未找到组件：${componentName}`)
+        return () => import("@/views/404.vue")
+    }
+}
 
 export const usePermissionStore = defineStore("permission", {
     state: () => ({
@@ -32,9 +45,11 @@ export const usePermissionStore = defineStore("permission", {
                         // 过滤动态路由
                         const asyncRoutes = filterDynamicRoutes(dynamicRoutes)
                         // 添加 404 路由
-                        concatenateRoutes.push({ path: "*", redirect: "/404", hidden: true })
+                        concatenateRoutes.push({ path: "/:pathMatch(.*)*", redirect: "/404", hidden: true })
                         // 添加动态路由
                         asyncRoutes.forEach(route => router.addRoute(route))
+                        // 添加拼接后的路由
+                        concatenateRoutes.forEach(route => router.addRoute(route))
                         // 设置最终路由
                         this.routes = constantRoutes.concat(concatenateRoutes)
                         this.topNavbarRoutes = topNavbarRoutes
@@ -54,6 +69,8 @@ function filterAsyncRouter(asyncRouterMap, concatenate = false) {
         if (!checkPermission(route)) {
             return false
         }
+        // 路由路径替换
+        route.path = route.navUrl
         // 组件映射
         const component = route.navComponent
         if (component) {
@@ -92,6 +109,8 @@ function filterChildren(childrenMap, parentRouter) {
         item.navUrl = normalizePath(item.navUrl)
         if (parentRouter) {
             item.navUrl = parentRouter.navUrl + "/" + item.navUrl
+            // 组件路径
+            item.path = item.navUrl
         }
         children.push(item)
     })

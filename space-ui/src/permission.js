@@ -25,7 +25,7 @@ router.beforeEach((to, from, next) => {
             // 在免登录白名单，直接进入
             next()
         } else {
-            if (userStore.roles.length === 0 || usePermissionStore().routes.length < 1) {
+            if (usePermissionStore().routes.length < 1) {
                 usePermissionStore().generateRouteList().then(accessRoutes => {
                     // 解决路由重复跳转的问题
                     next({ ...to, replace: true })
