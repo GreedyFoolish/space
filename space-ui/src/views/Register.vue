@@ -4,17 +4,17 @@
         <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" label-width="auto" status-icon
                  style="max-width: 600px">
             <el-form-item label="用户名" prop="userName">
-                <el-input v-model.number="ruleForm.userName"/>
+                <el-input v-model.number="ruleForm.userName" />
             </el-form-item>
             <el-form-item label="密码" prop="password">
-                <el-input v-model="ruleForm.password" autocomplete="off" type="password"/>
+                <el-input v-model="ruleForm.password" autocomplete="off" type="password" />
             </el-form-item>
             <el-form-item label="密码确认" prop="checkPass">
-                <el-input v-model="ruleForm.checkPass" autocomplete="off" type="password"/>
+                <el-input v-model="ruleForm.checkPass" autocomplete="off" type="password" />
             </el-form-item>
             <el-form-item label="验证码" prop="captcha" class="captcha-wrapper">
-                <el-input class="captcha-input" v-model="ruleForm.captcha" autocomplete="off"/>
-                <img class="captcha-img" :src="captchaImageUrl" @click="refreshCaptcha" alt="验证码"/>
+                <el-input class="captcha-input" v-model="ruleForm.captcha" autocomplete="off" />
+                <img class="captcha-img" :src="captchaImageUrl" @click="refreshCaptcha" alt="验证码" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submitForm(ruleFormRef)">
@@ -28,11 +28,11 @@
 </template>
 
 <script setup>
-import {reactive, ref} from "vue"
-import {getCaptcha, register} from "@/api/auth/auth.js";
-import router from "@/router/index.js";
-import {useUserStore} from "@/stores/userStore.js";
-import {sha256} from "@/utils/cryptoUtils.js";
+import { onUnmounted, reactive, ref } from "vue"
+import { getCaptcha, register } from "@/api/auth/auth.js"
+import router from "@/router/index.js"
+import { useUserStore } from "@/stores/userStore.js"
+import { sha256 } from "@/utils/cryptoUtils.js"
 
 const ruleFormRef = ref()
 const captchaKey = ref()
@@ -77,33 +77,33 @@ const confirmPass = (rule, value, callback) => {
 const ruleForm = reactive({
     userName: "",
     password: "",
-    checkPass: "",
+    checkPass: ""
 })
 
 const rules = reactive({
-    userName: [{validator: validateName, trigger: "blur"}],
-    password: [{validator: validatePass, trigger: "blur"}],
-    checkPass: [{validator: confirmPass, trigger: "blur"}]
+    userName: [{ validator: validateName, trigger: ["blur", "change"] }],
+    password: [{ validator: validatePass, trigger: ["blur", "change"] }],
+    checkPass: [{ validator: confirmPass, trigger: ["blur", "change"] }]
 })
 
-let lastClickTime = 0;
-const coolDown = 5000;
+let lastClickTime = 0
+const coolDown = 5000
 const refreshCaptcha = () => {
-    const now = Date.now();
+    const now = Date.now()
     if (now - lastClickTime < coolDown) {
-        console.warn("请等待冷却时间结束");
+        console.warn("请等待冷却时间结束")
     } else {
-        lastClickTime = now;
-        fetchCaptcha();
+        lastClickTime = now
+        fetchCaptcha()
     }
-};
+}
 
 const fetchCaptcha = () => {
     getCaptcha().then(response => {
-        const captchaKey = response.headers.get("X-Captcha-Key");
-        captchaImageUrl.value = URL.createObjectURL(response.data);
-        sessionStorage.setItem("captchaKey", captchaKey);
-    });
+        const captchaKey = response.headers.get("X-Captcha-Key")
+        captchaImageUrl.value = URL.createObjectURL(response.data)
+        sessionStorage.setItem("captchaKey", captchaKey)
+    })
 }
 
 fetchCaptcha()
@@ -116,14 +116,14 @@ const submitForm = async (formEl) => {
     formEl.validate(async valid => {
         if (valid) {
             const hashPassword = await sha256(ruleForm.password)
-            register({...ruleForm, userPassword: hashPassword}).then(res => {
+            register({ ...ruleForm, userPassword: hashPassword }).then(res => {
                 if (res.code === 200) {
                     const token = res.data?.token
                     if (!token) {
                         return
                     }
                     useUserStore().login(token).then(() => {
-                        router.push("/home");
+                        router.push("/home")
                     })
                 }
             })
@@ -141,6 +141,18 @@ const resetForm = (formEl) => {
 const toLogin = () => {
     router.push("/login")
 }
+
+const handleEnterKey = (event) => {
+    if (event.key === "Enter") {
+        submitForm(ruleFormRef.value)
+    }
+}
+
+window.addEventListener("keydown", handleEnterKey)
+
+onUnmounted(() => {
+    window.removeEventListener("keydown", handleEnterKey)
+})
 </script>
 
 <style scoped>

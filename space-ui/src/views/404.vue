@@ -1,10 +1,12 @@
+<template>
+    <div>
+        404页面
+    </div>
+</template>
+
 <script setup>
 
 </script>
-
-<template>
-
-</template>
 
 <style scoped>
 
