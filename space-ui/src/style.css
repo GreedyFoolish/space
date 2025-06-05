@@ -44,4 +44,8 @@ a:hover {
     /* 侧边栏 */
     --sidebar-container-background-color: #ffffff;
     --sidebar-container-transition: width 0.28s;
+    /* 侧边栏菜单 */
+    --sidebar-icon-width: 16px;
+    --sidebar-icon-height: 16px;
+    --sidebar-icon-margin-right: 8px;
 }

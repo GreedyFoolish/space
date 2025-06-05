@@ -51,8 +51,8 @@ const renderedNodes = computed(() => {
 
 <style scoped>
 .sidebar-icon {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
+    width: var(--sidebar-icon-width);
+    height: var(--sidebar-icon-height);
+    margin-right: var(--sidebar-icon-margin-right);
 }
 </style>
