@@ -1,3 +1,5 @@
+import CryptoJS from "crypto-js";
+
 /**
  * 使用 SHA-256 算法对密码进行哈希
  * 此函数利用浏览器内置的 crypto 对象来执行哈希操作，确保密码的安全性
@@ -10,7 +12,8 @@
 export async function sha256(password) {
     // 检查浏览器是否支持 crypto 对象
     if (!window.crypto || !window.crypto.subtle) {
-        throw new Error("浏览器不支持 crypto 对象");
+        // 如果不支持，则使用 CryptoJS 进行 SHA-256 哈希
+        return Promise.resolve(CryptoJS.SHA256(password).toString());
     }
     // 使用浏览器内置的 crypto 对象
     const encoder = new TextEncoder();
