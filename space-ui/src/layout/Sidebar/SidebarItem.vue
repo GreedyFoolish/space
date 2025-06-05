@@ -11,10 +11,11 @@
             <template #title>
                 <SidebarText :icon="item.navIcon" :title="item.navName"></SidebarText>
             </template>
-            <SidebarItem v-for="child in item.children"
-                         :key="child.navUrl"
-                         :item="child"
-                         :basePath="resolvePath(item.navUrl)"
+            <SidebarItem
+                v-for="child in item.children"
+                :key="child.navUrl"
+                :item="child"
+                :basePath="resolvePath(item.navUrl)"
             >
             </SidebarItem>
         </el-sub-menu>

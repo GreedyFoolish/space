@@ -11,8 +11,9 @@
         </div>
         <!-- 顶部导航栏菜单 -->
         <div class="top-navbar-menu">
-            <template v-for="(item, index) in topMenu.filter((_, index) => index < visibleNumber)"
-                      :key="`menu-item-${item.id ||index}`"
+            <template
+                v-for="(item, index) in topMenu.filter((_, index) => index < visibleNumber)"
+                :key="`menu-item-${item.id || index}`"
             >
                 <div class="top-navbar-menu-item" @click="activeMenu(item)"
                      :class="{ 'active': currentMenu === item.navUrl }">
@@ -30,7 +31,8 @@
                     <el-dropdown-menu>
                         <el-dropdown-item
                             v-for="(item, index) in topMenu.filter((_, index) => index >= visibleNumber)"
-                            :key="`dropdown-menu-${item.id ||index}`" @click="activeMenu(item)"
+                            :key="`dropdown-menu-${item.id || index}`"
+                            @click="activeMenu(item)"
                             :class="{ 'active': currentMenu === item.navUrl }"
                         >
                             {{ item.navName }}

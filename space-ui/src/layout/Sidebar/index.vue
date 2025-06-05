@@ -1,10 +1,11 @@
 <template>
     <el-scrollbar>
         <el-menu mode="vertical">
-            <SidebarItem v-for="(item, index) in topMenu"
-                         :key="`menu-item-${item.id ||index}`"
-                         :item="item"
-                         :basePath="basePath"
+            <SidebarItem
+                v-for="(item, index) in topMenu"
+                :key="`menu-item-${item.id || index}`"
+                :item="item"
+                :basePath="basePath"
             >
             </SidebarItem>
         </el-menu>
