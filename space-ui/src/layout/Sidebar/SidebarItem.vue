@@ -2,14 +2,14 @@
     <template v-if="showChild(item)">
         <SidebarLink :to="resolvePath(onlyOneChildren.navUrl, onlyOneChildren.query)">
             <el-menu-item :index="resolvePath(onlyOneChildren.navUrl)">
-                <SidebarText :title="onlyOneChildren.navName"></SidebarText>
+                <SidebarText :icon="onlyOneChildren.navIcon" :title="onlyOneChildren.navName"></SidebarText>
             </el-menu-item>
         </SidebarLink>
     </template>
     <template v-else>
         <el-sub-menu :index="resolvePath(item.navUrl)" teleported>
             <template #title>
-                <SidebarText :title="item.navName"></SidebarText>
+                <SidebarText :icon="item.navIcon" :title="item.navName"></SidebarText>
             </template>
             <SidebarItem v-for="child in item.children"
                          :key="child.navUrl"
