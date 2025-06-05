@@ -1,7 +1,7 @@
-import js from "@eslint/js";
-import prettier from "eslint-config-prettier";
-import importPlugin from "eslint-plugin-import";
-import vue from "eslint-plugin-vue";
+import js from "@eslint/js"
+import prettier from "eslint-config-prettier"
+import importPlugin from "eslint-plugin-import"
+import vue from "eslint-plugin-vue"
 import vueParser from "vue-eslint-parser"
 
 /**
@@ -14,13 +14,13 @@ export default [
         ...js.configs.recommended,
         rules: {
             // JS 基础规则可在此覆盖
-        },
+        }
     },
 
     {
         files: ["**/*.vue"],
         plugins: {
-            vue,
+            vue
         },
         languageOptions: {
             parser: vueParser,
@@ -28,9 +28,9 @@ export default [
                 ecmaVersion: 2021,
                 sourceType: "module",
                 ecmaFeatures: {
-                    modules: true,
-                },
-            },
+                    modules: true
+                }
+            }
         },
         rules: {
             // Vue 推荐规则
@@ -50,32 +50,32 @@ export default [
                     singleline: 5,
                     multiline: {
                         max: 1,
-                        allowFirstLine: false,
-                    },
-                },
+                        allowFirstLine: false
+                    }
+                }
             ],
             // template 标签后换行
             "vue/html-closing-bracket-newline": [
                 "error",
                 {
                     singleline: "never",
-                    multiline: "always",
-                },
+                    multiline: "always"
+                }
             ],
             // 引号使用双引号
-            "vue/html-quotes": ["error", "double"],
-        },
+            "vue/html-quotes": ["error", "double"]
+        }
     },
 
     {
         // 所有模块通用规则
-        ignores: ["/node_modules/", "/dist/", "**/*.log"],
+        ignores: ["/node_modules/", "/dist/", "**/*.log"]
     },
 
     {
         // 导入排序规则
         plugins: {
-            import: importPlugin,
+            import: importPlugin
         },
         rules: {
             "import/order": [
@@ -97,9 +97,9 @@ export default [
                      *      当前目录的 index 文件 | import index from "./"
                      */
                     groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
-                    alphabetize: {order: "asc"},
-                },
-            ],
+                    alphabetize: { order: "asc" }
+                }
+            ]
         },
         settings: {
             "import/resolver": {
@@ -110,12 +110,12 @@ export default [
                     extensions: [".js", ".vue", ".json"]
                 },
                 node: {
-                    extensions: [".js", ".vue", ".json"],
-                },
-            },
-        },
+                    extensions: [".js", ".vue", ".json"]
+                }
+            }
+        }
     },
 
     // 关闭与 prettier 的冲突规则
-    prettier,
-];
+    prettier
+]
