@@ -6,8 +6,7 @@
             <Sidebar class="sidebar-container"></Sidebar>
             <div class="main-container">
                 <div>
-                    <!--                <Navbar @setLayout="setLayout"/>-->
-                    <!--                <TagsView v-if="needTagsView"/>-->
+                    <TagsView></TagsView>
                 </div>
                 <AppMain></AppMain>
             </div>
@@ -17,7 +16,6 @@
 
 <script setup>
 import AppMain from "@/layout/AppMain/index.vue"
-import Navbar from "@/layout/Navbar/index.vue"
 import Sidebar from "@/layout/Sidebar/index.vue"
 import TagsView from "@/layout/TagsView/index.vue"
 import TopNavbar from "@/layout/TopNavbar/index.vue"

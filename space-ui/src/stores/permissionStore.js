@@ -71,6 +71,12 @@ function filterAsyncRouter(asyncRouterMap, concatenate = false) {
         }
         // 路由路径替换
         route.path = route.navUrl
+        // 路由名称
+        route.name = route.navName
+        // 固定路由
+        if (route.navSort === 0) {
+            route.affix = true
+        }
         // 组件映射
         const component = route.navComponent
         if (component) {
@@ -111,6 +117,8 @@ function filterChildren(childrenMap, parentRouter) {
             item.navUrl = parentRouter.navUrl + "/" + item.navUrl
             // 组件路径
             item.path = item.navUrl
+            // 路由名称
+            item.name = item.navName
         }
         children.push(item)
     })

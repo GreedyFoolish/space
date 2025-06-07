@@ -48,4 +48,28 @@ a:hover {
     --sidebar-icon-width: 16px;
     --sidebar-icon-height: 16px;
     --sidebar-icon-margin-right: 8px;
+    /* 标签页 */
+    --tags-view-container-height: 40px;
+    --tags-view-container-background-color: #ffffff;
+    --tags-view-container-border-bottom: 1px solid #d8dce5;
+    --tags-view-container-box-shadow: 0 1px 3px 0 #0000001e, 0 0 3px 0 #0000000a;
+    /* 标签页项 */
+    --tags-view-item-width: 20px;
+    --tags-view-item-height: 28px;
+    --tags-view-item-margin: 0 4px;
+    --tags-view-item-padding: 0 8px;
+    --tags-view-item-font-size: 14px;
+    --tags-view-item-default-color: #495060;
+    --tags-view-item-background-color: #ffffff;
+    --tags-view-item-border: 1px solid #d8dce5;
+    --tags-view-item-active-color: #ffffff;
+    --tags-view-item-active-background-color: #409eff;
+    --tags-view-item-active-border-color: 1px solid #409eff;
+    /* 标签页项before */
+    --tags-view-item-active-before-width: 6px;
+    --tags-view-item-active-before-height: 6px;
+    --tags-view-item-active-before-margin-right: 4px;
+    --tags-view-item-active-before-transform-translate: translate(0, -40%);
+    --tags-view-item-active-before-background-color: #ffffff;
+    --tags-view-item-active-before-border-radius: 50%;
 }
