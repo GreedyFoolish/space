@@ -132,18 +132,16 @@ watch(() => route.path, (newValue, oldValue) => {
 }
 
 :deep(.el-scrollbar) {
-    overflow-x: auto;
+    overflow: auto;
 }
 
 :deep(.el-scrollbar__wrap) {
-    display: inline-block;
-    overflow-x: auto;
+    display: flex;
 }
 
 :deep(.el-scrollbar__view) {
     display: inline-flex;
     align-items: center;
-    flex-wrap: nowrap;
     flex-shrink: 0;
 }
 </style>

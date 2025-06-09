@@ -42,6 +42,7 @@ a:hover {
     --top-navbar-user-name-margin-left: 6px;
     --top-navbar-user-name-margin-right: 18px;
     /* 侧边栏 */
+    --sidebar-container-width: 200px;
     --sidebar-container-background-color: #ffffff;
     --sidebar-container-transition: width 0.28s;
     /* 侧边栏菜单 */

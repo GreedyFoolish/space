@@ -54,8 +54,9 @@ const handleClickOutSide = () => {
         }
 
         .sidebar-container {
-            width: 200px;
+            width: var(--sidebar-container-width);
             height: 100%;
+            flex-shrink: 0;
             background-color: var(--sidebar-container-background-color);
             transition: var(--sidebar-container-transition);
         }
