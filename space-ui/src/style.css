@@ -69,8 +69,20 @@ a:hover {
     /* 标签页项before */
     --tags-view-item-active-before-width: 6px;
     --tags-view-item-active-before-height: 6px;
-    --tags-view-item-active-before-margin-right: 4px;
+    --tags-view-item-active-before-margin: 8px 6px 0 0;
     --tags-view-item-active-before-transform-translate: translate(0, -40%);
     --tags-view-item-active-before-background-color: #ffffff;
     --tags-view-item-active-before-border-radius: 50%;
+    /* 标签页项关闭按钮 */
+    --tags-view-item-close-width: 16px;
+    --tags-view-item-close-height: 16px;
+    --tags-view-item-close-margin-left: 4px;
+    --tags-view-item-close-border-radius: 50%;
+    --tags-view-item-close-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    --tags-view-item-close-transform-origin: 100% 50%;
+    /* 标签页项关闭按钮hover */
+    --tags-view-item-close-hover-color: #ffffff;
+    --tags-view-item-close-hover-background-color: #b4bccc;
+    /* 标签页项关闭按钮icon */
+    --tags-view-item-close-icon-transform: translate(0, -25%) scale(0.5);
 }

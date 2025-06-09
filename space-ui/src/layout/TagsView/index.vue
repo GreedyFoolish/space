@@ -7,10 +7,11 @@
                 :to="{ path: item.path, query: item.query, fullPath: item.fullPath }"
                 tag="span"
                 :class="{ 'tags-view-item': true, 'active': isActive(item) }"
-                :style="getLinkStyle(item.name)"
             >
                 {{ item.title }}
-                <span v-if="item.affix" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
+                <span v-if="!isAffix(item)" class="tags-view-item-close">
+                     <CloseBold class="tags-view-item-close-icon"></CloseBold>
+                </span>
             </router-link>
         </ScrollPane>
     </div>
@@ -22,22 +23,18 @@ import { useRoute } from "vue-router"
 import ScrollPane from "@/layout/TagsView/ScrollPane.vue"
 import { usePermissionStore } from "@/stores/permissionStore.js"
 import { useTagsViewStore } from "@/stores/tagsView.js"
-import { getCssVariableValue } from "@/utils/domUtils.js"
 import { customResolvePath } from "@/utils/pathUtils.js"
 
 const route = useRoute()
 const permissionStore = usePermissionStore()
 const tagsViewStore = useTagsViewStore()
 
-const getLinkStyle = (text) => {
-    console.log("getLinkStyle", text)
-    const itemWidth = getCssVariableValue("--tags-view-item-width").value
-    console.log("itemWidth", text)
-    // return `width: ${text.length * itemWidth}px;`
-}
-
 const isActive = (tag) => {
     return tag.path === route.path
+}
+
+const isAffix = (tag) => {
+    return tag?.meta?.affix
 }
 
 const filterAffixTags = (routes, basePath = "/") => {
@@ -46,9 +43,10 @@ const filterAffixTags = (routes, basePath = "/") => {
         if (route.affix) {
             const tagPath = customResolvePath(basePath, route.path)
             tags.push({
+                fullPath: tagPath,
+                meta: { affix: true },
                 name: route.navName,
                 path: tagPath,
-                fullPath: tagPath
             })
         }
         if (route?.children?.length > 0) {
@@ -66,13 +64,10 @@ const initTagsView = () => {
     affixTags.forEach(tag => {
         tagsViewStore.addVisitedView(tag)
     })
-    console.log("initTagsView", permissionStore.topNavbarRoutes)
-    console.log("tagsViewStore", tagsViewStore.visitedViews)
 }
 
 const addTagsView = () => {
     if (route.path) {
-        console.log("name", route)
         tagsViewStore.addVisitedView(route)
     }
 }
@@ -83,7 +78,6 @@ onMounted(() => {
 })
 
 watch(() => route.path, (newValue, oldValue) => {
-    console.log("route ", newValue, oldValue)
     addTagsView()
 })
 </script>
@@ -101,7 +95,8 @@ watch(() => route.path, (newValue, oldValue) => {
             height: var(--tags-view-item-height);
             margin: var(--tags-view-item-margin);
             padding: var(--tags-view-item-padding);
-            display: inline-block;
+            display: flex;
+            align-items: center;
             position: relative;
             font-size: var(--tags-view-item-font-size);
             line-height: var(--tags-view-item-height);
@@ -111,20 +106,41 @@ watch(() => route.path, (newValue, oldValue) => {
             cursor: pointer;
 
             &.active {
-                display: inline-block;
                 color: var(--tags-view-item-active-color);
                 background-color: var(--tags-view-item-active-background-color);
                 border-color: var(--tags-view-item-active-border-color);
 
-                &::before {
+                &:before {
                     content: "";
                     width: var(--tags-view-item-active-before-width);
                     height: var(--tags-view-item-active-before-height);
-                    margin-right: var(--tags-view-item-active-before-margin-right);
+                    margin: var(--tags-view-item-active-before-margin);
                     transform: var(--tags-view-item-active-before-transform-translate);
-                    display: inline-block;
                     background-color: var(--tags-view-item-active-before-background-color);
                     border-radius: var(--tags-view-item-active-before-border-radius);
+                }
+
+                .tags-view-item-close {
+                    color: var(--tags-view-item-active-color);
+                }
+            }
+
+            .tags-view-item-close {
+                width: var(--tags-view-item-close-width);
+                height: var(--tags-view-item-close-height);
+                margin-left: var(--tags-view-item-close-margin-left);
+                color: var(--tags-view-item-default-color);
+                border-radius: var(--tags-view-item-close-border-radius);
+                transition: var(--tags-view-item-close-transition);
+                transform-origin: var(--tags-view-item-close-transform-origin);
+
+                &:hover {
+                    color: var(--tags-view-item-close-hover-color);
+                    background-color: var(--tags-view-item-close-hover-background-color);
+                }
+
+                .tags-view-item-close-icon {
+                    transform: var(--tags-view-item-close-icon-transform);
                 }
             }
         }
