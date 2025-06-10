@@ -10,6 +10,12 @@ export const useTagsViewStore = defineStore("tagsView", {
         getCachedViews: (state) => state.cachedViews
     },
     actions: {
+        boundCheck(index) {
+            if (index >= this.visitedViews.length) {
+                return this.visitedViews.length - 1
+            }
+            return index
+        },
         addVisitedView(view) {
             if (this.visitedViews.some(v => v.path === view.path)) {
                 console.warn(`已添加具有相同路径“${view.path}”的路由`)
@@ -20,6 +26,15 @@ export const useTagsViewStore = defineStore("tagsView", {
                     })
                 )
             }
+        },
+        deleteVisitedView(view) {
+            return new Promise(resolve => {
+                let index = this.visitedViews.findIndex(item => item.path === view.path)
+                this.visitedViews = this.visitedViews.filter(item => {
+                    return item.meta.affix || item.path !== view.path
+                })
+                resolve(this.boundCheck(index))
+            })
         }
     }
 })

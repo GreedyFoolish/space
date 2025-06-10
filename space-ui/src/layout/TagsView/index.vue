@@ -1,33 +1,105 @@
 <template>
-    <div class="tags-view-container">
+    <div ref="tagsViewContainer" class="tags-view-container">
         <ScrollPane class="tags-view-wrapper">
             <router-link
-                v-for="(item, index) in tagsViewStore.visitedViews"
+                v-for="(item, index) in visitedViews"
                 :key="`tag-${item.path || index}`"
                 :to="{ path: item.path, query: item.query, fullPath: item.fullPath }"
                 tag="span"
                 :class="{ 'tags-view-item': true, 'active': isActive(item) }"
+                @contextmenu.prevent="openMenu($event, item)"
             >
                 {{ item.title }}
-                <span v-if="!isAffix(item)" class="tags-view-item-close">
+                <span v-if="!isAffix(item)" class="tags-view-item-close" @click.prevent.stop="closeSelectedTag(item)">
                      <CloseBold class="tags-view-item-close-icon"></CloseBold>
                 </span>
             </router-link>
         </ScrollPane>
+        <ul :style="menuStyle" class="tags-view-contextmenu-wrapper">
+            <li v-for="(item, index) in filteredContextmenuList"
+                @click="handleMenuItemClick(item)"
+            >
+                <component class="tags-view-contextmenu-icon" :is="item.icon" :key="index"></component>
+                {{ item.name }}
+            </li>
+        </ul>
     </div>
 </template>
 
 <script setup>
-import { onMounted, watch } from "vue"
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue"
 import { useRoute } from "vue-router"
 import ScrollPane from "@/layout/TagsView/ScrollPane.vue"
+import router from "@/router/index.js"
+import { useAppConfigStore } from "@/stores/appConfigStore.js"
 import { usePermissionStore } from "@/stores/permissionStore.js"
 import { useTagsViewStore } from "@/stores/tagsView.js"
 import { customResolvePath } from "@/utils/pathUtils.js"
 
 const route = useRoute()
+const appConfigStore = useAppConfigStore()
 const permissionStore = usePermissionStore()
 const tagsViewStore = useTagsViewStore()
+const tagsViewContainer = ref(null)
+const selectedTag = ref(null)
+const menuStyle = ref({})
+const iconMap = computed(() => appConfigStore.global.ElIconsVue)
+const contextmenuList = ref([
+    {
+        name: "刷新页面",
+        visible: (tag) => true,
+        icon: iconMap.value["Refresh"],
+        handler: (tag) => {
+            // tagsViewStore.refreshSelectedTag(tag)
+        }
+    },
+    {
+        name: "关闭当前",
+        visible: (tag) => {
+            return !tag?.meta?.affix
+        },
+        icon: iconMap.value["Close"],
+        handler: (tag) => {
+            closeSelectedTag(tag)
+        }
+    },
+    {
+        name: "关闭其他",
+        visible: (tag) => true,
+        icon: iconMap.value["CircleClose"],
+        handler: (tag) => {
+            // tagsViewStore.delOthersVisitedViews(tag)
+        }
+    },
+    {
+        name: "关闭左侧",
+        visible: (tag) => true,
+        icon: iconMap.value["Back"],
+        handler: (tag) => {
+            // tagsViewStore.delOthersVisitedViews(tag)
+        }
+    },
+    {
+        name: "关闭右侧",
+        visible: (tag) => true,
+        icon: iconMap.value["Right"],
+        handler: (tag) => {
+            // tagsViewStore.delOthersVisitedViews(tag)
+        }
+    },
+    {
+        name: "关闭所有",
+        visible: (tag) => true,
+        icon: iconMap.value["CircleClose"],
+        handler: (tag) => {
+            // tagsViewStore.delAllVisitedViews()
+        }
+    }
+])
+const visitedViews = computed(() => tagsViewStore.visitedViews)
+const filteredContextmenuList = computed(() => {
+    return contextmenuList.value.filter(item => item.visible(selectedTag.value))
+})
 
 const isActive = (tag) => {
     return tag.path === route.path
@@ -37,6 +109,65 @@ const isAffix = (tag) => {
     return tag?.meta?.affix
 }
 
+// 菜单点击处理（函数节流）
+let lastClickTime = 0
+const handleMenuItemClick = (item) => {
+    const now = Date.now()
+    if (now - lastClickTime < 300) {
+        return
+    }
+    lastClickTime = now
+    item.handler(selectedTag.value)
+}
+
+// 打开菜单
+const openMenu = (e, tag) => {
+    const menuWidth = 100
+    const containerRect = tagsViewContainer.value.getBoundingClientRect()
+    const { left: offsetLeft, top: offsetTop, width: offsetWidth } = containerRect
+    let left = e.clientX - offsetLeft
+    let top = e.clientY - offsetTop
+    if (left > offsetWidth - menuWidth) {
+        left = left - menuWidth
+    }
+
+    menuStyle.value = {
+        display: "block",
+        left: `${left}px`,
+        top: `${top}px`
+    }
+    selectedTag.value = tag
+}
+
+// 关闭菜单
+const closeMenu = () => {
+    menuStyle.value = {
+        display: "none"
+    }
+}
+
+// 切换到附近的标签页
+const toNearView = (index) => {
+    const nearView = visitedViews.value?.[index]
+    if (nearView && nearView.path !== route.path) {
+        router.push(nearView.path)
+    } else {
+        router.push("/")
+    }
+}
+
+// 关闭选中的标签页
+const closeSelectedTag = (view) => {
+    tagsViewStore.deleteVisitedView(view).then(result => {
+        const index = result ?? 0
+        if (view.path === route.path) {
+            toNearView(index)
+        }
+        closeMenu()
+    })
+}
+
+// 过滤出需要固定的标签页
 const filterAffixTags = (routes, basePath = "/") => {
     let tags = []
     routes.forEach(route => {
@@ -59,6 +190,7 @@ const filterAffixTags = (routes, basePath = "/") => {
     return tags
 }
 
+// 初始化固定的标签页
 const initTagsView = () => {
     const affixTags = filterAffixTags(permissionStore.topNavbarRoutes)
     affixTags.forEach(tag => {
@@ -66,6 +198,7 @@ const initTagsView = () => {
     })
 }
 
+// 添加标签页
 const addTagsView = () => {
     if (route.path) {
         tagsViewStore.addVisitedView(route)
@@ -75,6 +208,12 @@ const addTagsView = () => {
 onMounted(() => {
     initTagsView()
     addTagsView()
+    // 点击外部关闭菜单
+    document.addEventListener("click", closeMenu)
+})
+
+onBeforeUnmount(() => {
+    document.removeEventListener("click", closeMenu)
 })
 
 watch(() => route.path, (newValue, oldValue) => {
@@ -86,6 +225,7 @@ watch(() => route.path, (newValue, oldValue) => {
 .tags-view-container {
     width: 100%;
     height: var(--tags-view-container-height);
+    position: relative;
     background: var(--tags-view-container-background-color);
     border-bottom: var(--tags-view-container-border-bottom);
     box-shadow: var(--tags-view-container-box-shadow);
@@ -142,6 +282,37 @@ watch(() => route.path, (newValue, oldValue) => {
                 .tags-view-item-close-icon {
                     transform: var(--tags-view-item-close-icon-transform);
                 }
+            }
+        }
+    }
+
+    .tags-view-contextmenu-wrapper {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        list-style-type: var(--tags-view-contextmenu-wrapper-list-style-type);
+        font-size: var(--tags-view-contextmenu-wrapper-font-size);
+        color: var(--tags-view-contextmenu-wrapper-color);
+        background-color: var(--tags-view-contextmenu-wrapper-background-color);
+        border-radius: var(--tags-view-contextmenu-wrapper-border-radius);
+        box-shadow: var(--tags-view-contextmenu-wrapper-box-shadow);
+        z-index: var(--tags-view-contextmenu-wrapper-z-index);
+
+        li {
+            padding: var(--tags-view-contextmenu-li-padding);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+
+            &:hover {
+                background-color: var(--tags-view-contextmenu-li-hover-background-color);
+            }
+
+            .tags-view-contextmenu-icon {
+                width: var(--tags-view-contextmenu-li-icon-width);
+                height: var(--tags-view-contextmenu-li-icon-height);
+                margin-right: var(--tags-view-contextmenu-li-icon-margin-right);
             }
         }
     }
