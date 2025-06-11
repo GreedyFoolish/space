@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue"
+import { ref, computed } from "vue"
 import SidebarItem from "@/layout/Sidebar/SidebarItem.vue"
 import { useAppConfigStore } from "@/stores/appConfigStore.js"
 import { usePermissionStore } from "@/stores/permissionStore.js"

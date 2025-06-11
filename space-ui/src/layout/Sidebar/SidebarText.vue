@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { h, computed } from "vue"
+import { computed, h } from "vue"
 import { useAppConfigStore } from "@/stores/appConfigStore.js"
 
 const props = defineProps({
