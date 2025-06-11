@@ -1,24 +1,24 @@
 <template>
     <section class="app-main">
-        <transition name="fade-transform" mode="out-in">
-            <keep-alive>
-                <router-view :key="key" />
-            </keep-alive>
-        </transition>
+        <router-view :key="routeKey" v-slot="{ Component }">
+            <transition name="fade-transform" mode="out-in">
+                <keep-alive>
+                    <component :is="Component" v-if="route.meta?.keepAlive" />
+                    <component :is="Component" v-else />
+                </keep-alive>
+            </transition>
+        </router-view>
     </section>
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from "vue"
+import { computed } from "vue"
 import { useRoute } from "vue-router"
 import { useAppConfigStore } from "@/stores/appConfigStore.js"
 
 const appConfig = useAppConfigStore()
-const key = ref("")
-
-onBeforeMount(() => {
-    key.value = useRoute().path
-})
+const route = useRoute()
+const routeKey = computed(() => route.path)
 </script>
 
 <style scoped>
