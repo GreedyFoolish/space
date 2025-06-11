@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onUnmounted, watch } from "vue"
+import { ref, reactive, onUnmounted, watch } from "vue"
 import { useRoute } from "vue-router"
 import { getCaptcha, login } from "@/api/auth/auth.js"
 import router from "@/router/index.js"
