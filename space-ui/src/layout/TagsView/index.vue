@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue"
+import { ref, computed, shallowRef, onMounted, onBeforeUnmount, watch } from "vue"
 import { useRoute } from "vue-router"
 import ScrollPane from "@/layout/TagsView/ScrollPane.vue"
 import router from "@/router/index.js"
@@ -43,7 +43,14 @@ const tagsViewStore = useTagsViewStore()
 const tagsViewContainer = ref(null)
 const selectedTag = ref(null)
 const menuStyle = ref({})
-const iconMap = computed(() => appConfigStore.global.ElIconsVue)
+const iconMap = computed(() => {
+    const icons = appConfigStore.global.ElIconsVue
+    // 创建一个浅引用的映射对象
+    return Object.entries(icons).reduce((acc, [key, value]) => {
+        acc[key] = shallowRef(value)
+        return acc
+    }, {})
+})
 const contextmenuList = ref([
     {
         name: "刷新页面",
@@ -177,7 +184,7 @@ const filterAffixTags = (routes, basePath = "/") => {
                 fullPath: tagPath,
                 meta: { affix: true },
                 name: route.navName,
-                path: tagPath,
+                path: tagPath
             })
         }
         if (route?.children?.length > 0) {
