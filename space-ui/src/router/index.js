@@ -22,6 +22,11 @@ export const constantRoutes = [
         hidden: true
     },
     {
+        path: "/redirect/:path(.*)",
+        name: "Redirect",
+        component: () => import("@/views/Redirect.vue") // 空组件或简单重定向逻辑
+    },
+    {
         path: "/404",
         component: () => import("@/views/404.vue"),
         hidden: true

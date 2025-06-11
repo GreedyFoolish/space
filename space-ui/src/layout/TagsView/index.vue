@@ -57,7 +57,7 @@ const contextmenuList = ref([
         visible: (tag) => true,
         icon: iconMap.value["Refresh"],
         handler: (tag) => {
-            // tagsViewStore.refreshSelectedTag(tag)
+            refreshCurrentTag(tag)
         }
     },
     {
@@ -163,11 +163,22 @@ const toNearView = (index) => {
     }
 }
 
+// 刷新当前标签页
+const refreshCurrentTag = (tag = router.currentRoute) => {
+    const currentPath = tag.path
+    router.replace({
+        path: `/redirect/${encodeURIComponent(currentPath)}`,
+        query: { redirect: encodeURIComponent(currentPath) }
+    }).then(() => {
+        console.log("刷新页面")
+    })
+}
+
 // 关闭选中的标签页
-const closeSelectedTag = (view) => {
-    tagsViewStore.deleteVisitedView(view).then(result => {
+const closeSelectedTag = (tag) => {
+    tagsViewStore.deleteVisitedView(tag).then(result => {
         const index = result ?? 0
-        if (view.path === route.path) {
+        if (tag.path === route.path) {
             toNearView(index)
         }
         closeMenu()
