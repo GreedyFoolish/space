@@ -178,7 +178,7 @@ const refreshCurrentTag = (tag = router.currentRoute) => {
 const closeSelectedTag = (tag) => {
     tagsViewStore.deleteVisitedView(tag).then(result => {
         const index = result ?? 0
-        if (tag.path === route.path) {
+        if (isActive(tag)) {
             toNearView(index)
         }
         closeMenu()
