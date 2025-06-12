@@ -15,11 +15,12 @@
                 </span>
             </router-link>
         </ScrollPane>
-        <ul :style="menuStyle" class="tags-view-contextmenu-wrapper">
+        <ul v-show="menuVisible" :style="menuStyle" class="tags-view-contextmenu-wrapper">
             <li v-for="(item, index) in filteredContextmenuList"
                 @click="handleMenuItemClick(item)"
+                :key="index"
             >
-                <component class="tags-view-contextmenu-icon" :is="item.icon" :key="index"></component>
+                <component class="tags-view-contextmenu-icon" :is="getIcon(item.iconName)"></component>
                 {{ item.name }}
             </li>
         </ul>
@@ -35,6 +36,7 @@ import { useAppConfigStore } from "@/stores/appConfigStore.js"
 import { usePermissionStore } from "@/stores/permissionStore.js"
 import { useTagsViewStore } from "@/stores/tagsView.js"
 import { customResolvePath } from "@/utils/pathUtils.js"
+import { throttle } from "@/utils/throttle.js"
 
 const route = useRoute()
 const appConfigStore = useAppConfigStore()
@@ -43,6 +45,7 @@ const tagsViewStore = useTagsViewStore()
 const tagsViewContainer = ref(null)
 const selectedTag = ref(null)
 const menuStyle = ref({})
+const menuVisible = ref(false)
 const iconMap = computed(() => {
     const icons = appConfigStore.global.ElIconsVue
     // 创建一个浅引用的映射对象
@@ -55,7 +58,7 @@ const contextmenuList = ref([
     {
         name: "刷新页面",
         visible: (tag) => true,
-        icon: iconMap.value["Refresh"],
+        iconName: "Refresh",
         handler: (tag) => {
             refreshCurrentTag(tag)
         }
@@ -65,7 +68,7 @@ const contextmenuList = ref([
         visible: (tag) => {
             return !tag?.meta?.affix
         },
-        icon: iconMap.value["Close"],
+        iconName: "Close",
         handler: (tag) => {
             closeSelectedTag(tag)
         }
@@ -73,7 +76,7 @@ const contextmenuList = ref([
     {
         name: "关闭其他",
         visible: (tag) => true,
-        icon: iconMap.value["CircleClose"],
+        iconName: "CircleClose",
         handler: (tag) => {
             closeOtherTags(tag)
         }
@@ -81,7 +84,7 @@ const contextmenuList = ref([
     {
         name: "关闭左侧",
         visible: (tag) => true,
-        icon: iconMap.value["Back"],
+        iconName: "Back",
         handler: (tag) => {
             closeLeftTags(tag)
         }
@@ -89,7 +92,7 @@ const contextmenuList = ref([
     {
         name: "关闭右侧",
         visible: (tag) => true,
-        icon: iconMap.value["Right"],
+        iconName: "Right",
         handler: (tag) => {
             closeRightTags(tag)
         }
@@ -97,7 +100,7 @@ const contextmenuList = ref([
     {
         name: "关闭所有",
         visible: (tag) => true,
-        icon: iconMap.value["CircleClose"],
+        iconName: "CircleClose",
         handler: (tag) => {
             closeAllTags(tag)
         }
@@ -116,16 +119,29 @@ const isAffix = (tag) => {
     return tag?.meta?.affix
 }
 
-// 菜单点击处理（函数节流）
-let lastClickTime = 0
-const handleMenuItemClick = (item) => {
-    const now = Date.now()
-    if (now - lastClickTime < 300) {
+// 获取图标安全方法
+const getIcon = (iconName) => {
+    if (!iconName || !iconMap.value[iconName]) {
+        // 返回一个默认图标或返回null让组件处理
+        return null
+    }
+    return iconMap.value[iconName].value
+}
+
+// 处理菜单点击
+const handleMenuItemClick = throttle((item) => {
+    if (!item.handler || typeof item.handler !== "function") {
         return
     }
-    lastClickTime = now
-    item.handler(selectedTag.value)
-}
+
+    try {
+        item.handler(selectedTag.value)
+        closeMenu()
+    } catch (error) {
+        console.error("菜单项点击处理出错:", error)
+    }
+}, 300)
+
 
 // 打开菜单
 const openMenu = (e, tag) => {
@@ -139,96 +155,118 @@ const openMenu = (e, tag) => {
     }
 
     menuStyle.value = {
-        display: "block",
         left: `${left}px`,
         top: `${top}px`
     }
     selectedTag.value = tag
+    menuVisible.value = true
 }
 
 // 关闭菜单
 const closeMenu = () => {
-    menuStyle.value = {
-        display: "none"
-    }
+    menuVisible.value = false
+    menuStyle.value = {}
 }
 
 // 切换到附近的标签页
 const toNearView = (index) => {
     const nearView = visitedViews.value?.[index]
     if (nearView) {
-        router.push(nearView.path)
+        router.push(nearView.path).catch(error => {
+            console.error("路由跳转失败:", error)
+        })
     } else {
-        router.push("/")
+        router.push("/").catch(error => {
+            console.error("默认路由跳转失败:", error)
+        })
     }
 }
 
 // 刷新当前标签页
-const refreshCurrentTag = (tag = router.currentRoute) => {
+const refreshCurrentTag = (tag = route) => {
     const currentPath = tag.path
     router.replace({
         path: `/redirect/${encodeURIComponent(currentPath)}`,
         query: { redirect: encodeURIComponent(currentPath) }
     }).then(() => {
         console.log("刷新页面")
+    }).catch(error => {
+        console.error("页面刷新失败:", error)
     })
 }
 
 // 关闭选中的标签页
-const closeSelectedTag = (tag = router.currentRoute) => {
+const closeSelectedTag = (tag = route) => {
     tagsViewStore.deleteVisitedView(tag).then(result => {
         const index = result ?? 0
         if (isActive(tag)) {
             toNearView(index)
         }
-        closeMenu()
+    }).catch(error => {
+        console.error("关闭标签页失败:", error)
     })
 }
 
 // 关闭其他的标签页
-const closeOtherTags = (tag = router.currentRoute) => {
+const closeOtherTags = (tag = route) => {
     tagsViewStore.deleteOthersVisitedViews(tag).then(result => {
         const index = result ?? 0
         if (index >= 0) {
             toNearView(index)
         }
+    }).catch(error => {
+        console.error("关闭其他标签页失败:", error)
     })
 }
 
 // 关闭左侧的标签页
-const closeLeftTags = (tag = router.currentRoute) => {
+const closeLeftTags = (tag = route) => {
     tagsViewStore.deleteLeftVisitedTags(tag).then(result => {
         const index = result ?? 0
         if (index >= 0) {
             toNearView(index)
         }
+    }).catch(error => {
+        console.error("关闭左侧标签页失败:", error)
     })
 }
 
 // 关闭右侧的标签页
-const closeRightTags = (tag = router.currentRoute) => {
+const closeRightTags = (tag = route) => {
     tagsViewStore.deleteRightVisitedTags(tag).then(result => {
         const index = result ?? 0
         if (index >= 0) {
             toNearView(index)
         }
+    }).catch(error => {
+        console.error("关闭右侧标签页失败:", error)
     })
 }
 
 // 关闭所有的标签页
-const closeAllTags = (tag = router.currentRoute) => {
+const closeAllTags = (tag = route) => {
     tagsViewStore.deleteAllVisitedTags(tag).then(result => {
         const index = result ?? 0
         if (index >= 0) {
             toNearView(index)
         }
+    }).catch(error => {
+        console.error("关闭所有标签页失败:", error)
     })
 }
 
 // 过滤出需要固定的标签页
 const filterAffixTags = (routes, basePath = "/") => {
+    if (!Array.isArray(routes)) {
+        return []
+    }
+
     let tags = []
     routes.forEach(route => {
+        if (!route || typeof route !== "object") {
+            return
+        }
+
         if (route.affix) {
             const tagPath = customResolvePath(basePath, route.path)
             tags.push({
@@ -238,7 +276,8 @@ const filterAffixTags = (routes, basePath = "/") => {
                 path: tagPath
             })
         }
-        if (route?.children?.length > 0) {
+
+        if (Array.isArray(route.children) && route.children.length > 0) {
             const tempTags = filterAffixTags(route.children, route.path)
             if (tempTags.length > 0) {
                 tags = [...tags, ...tempTags]
@@ -345,7 +384,6 @@ watch(() => route.path, (newValue, oldValue) => {
     }
 
     .tags-view-contextmenu-wrapper {
-        display: none;
         position: absolute;
         top: 0;
         left: 0;
