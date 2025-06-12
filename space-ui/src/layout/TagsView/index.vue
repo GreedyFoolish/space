@@ -75,7 +75,9 @@ const contextmenuList = ref([
     },
     {
         name: "关闭其他",
-        visible: (tag) => true,
+        visible: (tag) => {
+            return visitedViews.value.some(item => tag?.path !== item?.path && !item?.meta?.affix)
+        },
         iconName: "CircleClose",
         handler: (tag) => {
             closeOtherTags(tag)
@@ -83,7 +85,9 @@ const contextmenuList = ref([
     },
     {
         name: "关闭左侧",
-        visible: (tag) => true,
+        visible: (tag) => {
+            return tag?.path !== visitedViews.value[0]?.path
+        },
         iconName: "Back",
         handler: (tag) => {
             closeLeftTags(tag)
@@ -91,7 +95,9 @@ const contextmenuList = ref([
     },
     {
         name: "关闭右侧",
-        visible: (tag) => true,
+        visible: (tag) => {
+            return tag?.path !== visitedViews.value[visitedViews.value.length - 1]?.path
+        },
         iconName: "Right",
         handler: (tag) => {
             closeRightTags(tag)
