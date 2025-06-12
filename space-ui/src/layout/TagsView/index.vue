@@ -75,7 +75,7 @@ const contextmenuList = ref([
         visible: (tag) => true,
         icon: iconMap.value["CircleClose"],
         handler: (tag) => {
-            // tagsViewStore.delOthersVisitedViews(tag)
+            closeOtherTags(tag)
         }
     },
     {
@@ -83,7 +83,7 @@ const contextmenuList = ref([
         visible: (tag) => true,
         icon: iconMap.value["Back"],
         handler: (tag) => {
-            // tagsViewStore.delOthersVisitedViews(tag)
+            closeLeftTags(tag)
         }
     },
     {
@@ -91,7 +91,7 @@ const contextmenuList = ref([
         visible: (tag) => true,
         icon: iconMap.value["Right"],
         handler: (tag) => {
-            // tagsViewStore.delOthersVisitedViews(tag)
+            closeRightTags(tag)
         }
     },
     {
@@ -99,7 +99,7 @@ const contextmenuList = ref([
         visible: (tag) => true,
         icon: iconMap.value["CircleClose"],
         handler: (tag) => {
-            // tagsViewStore.delAllVisitedViews()
+            closeAllTags(tag)
         }
     }
 ])
@@ -156,7 +156,7 @@ const closeMenu = () => {
 // 切换到附近的标签页
 const toNearView = (index) => {
     const nearView = visitedViews.value?.[index]
-    if (nearView && nearView.path !== route.path) {
+    if (nearView) {
         router.push(nearView.path)
     } else {
         router.push("/")
@@ -175,13 +175,53 @@ const refreshCurrentTag = (tag = router.currentRoute) => {
 }
 
 // 关闭选中的标签页
-const closeSelectedTag = (tag) => {
+const closeSelectedTag = (tag = router.currentRoute) => {
     tagsViewStore.deleteVisitedView(tag).then(result => {
         const index = result ?? 0
         if (isActive(tag)) {
             toNearView(index)
         }
         closeMenu()
+    })
+}
+
+// 关闭其他的标签页
+const closeOtherTags = (tag = router.currentRoute) => {
+    tagsViewStore.deleteOthersVisitedViews(tag).then(result => {
+        const index = result ?? 0
+        if (index >= 0) {
+            toNearView(index)
+        }
+    })
+}
+
+// 关闭左侧的标签页
+const closeLeftTags = (tag = router.currentRoute) => {
+    tagsViewStore.deleteLeftVisitedTags(tag).then(result => {
+        const index = result ?? 0
+        if (index >= 0) {
+            toNearView(index)
+        }
+    })
+}
+
+// 关闭右侧的标签页
+const closeRightTags = (tag = router.currentRoute) => {
+    tagsViewStore.deleteRightVisitedTags(tag).then(result => {
+        const index = result ?? 0
+        if (index >= 0) {
+            toNearView(index)
+        }
+    })
+}
+
+// 关闭所有的标签页
+const closeAllTags = (tag = router.currentRoute) => {
+    tagsViewStore.deleteAllVisitedTags(tag).then(result => {
+        const index = result ?? 0
+        if (index >= 0) {
+            toNearView(index)
+        }
     })
 }
 

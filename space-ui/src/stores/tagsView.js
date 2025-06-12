@@ -29,11 +29,47 @@ export const useTagsViewStore = defineStore("tagsView", {
         },
         deleteVisitedView(view) {
             return new Promise(resolve => {
-                let index = this.visitedViews.findIndex(item => item.path === view.path)
+                const index = this.visitedViews.findIndex(item => item.path === view.path)
                 this.visitedViews = this.visitedViews.filter(item => {
                     return item.meta.affix || item.path !== view.path
                 })
                 resolve(this.boundCheck(index))
+            })
+        },
+        deleteOthersVisitedViews(view) {
+            return new Promise(resolve => {
+                this.visitedViews = this.visitedViews.filter(item => {
+                    return item.meta.affix || item.path === view.path
+                })
+                const index = this.visitedViews.findIndex(item => item.path === view.path)
+                resolve(this.boundCheck(index))
+            })
+        },
+        deleteLeftVisitedTags(view) {
+            return new Promise(resolve => {
+                const startIndex = this.visitedViews.findIndex(item => item.path === view.path)
+                this.visitedViews = this.visitedViews.filter((item, index) => {
+                    return item.meta.affix || index >= startIndex
+                })
+                const index = this.visitedViews.findIndex(item => item.path === view.path)
+                resolve(this.boundCheck(index))
+            })
+        },
+        deleteRightVisitedTags(view) {
+            return new Promise(resolve => {
+                const startIndex = this.visitedViews.findIndex(item => item.path === view.path)
+                this.visitedViews = this.visitedViews.filter((item, index) => {
+                    return item.meta.affix || index <= startIndex
+                })
+                resolve(this.boundCheck(startIndex))
+            })
+        },
+        deleteAllVisitedTags(view) {
+            return new Promise(resolve => {
+                this.visitedViews = this.visitedViews.filter(item => {
+                    return item.meta.affix
+                })
+                resolve(this.boundCheck(0))
             })
         }
     }
