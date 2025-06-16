@@ -4,7 +4,14 @@ import {createRouter, createWebHistory} from "vue-router"
 export const constantRoutes = [
     {
         path: "/",
-        redirect: "/home"
+        redirect: "/home",
+        component: () => import("@/layout/index.vue"),
+        children: [
+            {
+                path: "/home",
+                component: () => import("@/views/Home.vue")
+            }
+        ]
     },
     {
         path: "/login",
@@ -14,11 +21,6 @@ export const constantRoutes = [
     {
         path: "/register",
         component: () => import("@/views/Register.vue"),
-        hidden: true
-    },
-    {
-        path: "/home",
-        component: () => import("@/layout/index.vue"),
         hidden: true
     },
     {
