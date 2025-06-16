@@ -1,11 +1,11 @@
 <template>
-    <div :class="classObj" class="app-wrapper">
+    <div class="app-wrapper">
         <TopNavbar></TopNavbar>
         <div class="container-wrapper">
-            <div class="drawer-wrapper" @click="handleClickOutSide"></div>
-            <Sidebar class="sidebar-container"></Sidebar>
+            <Sidebar :class="sidebarClass" class="sidebar-container"></Sidebar>
             <div class="main-container">
                 <div>
+                    <Navbar></Navbar>
                     <TagsView></TagsView>
                 </div>
                 <AppMain></AppMain>
@@ -15,22 +15,20 @@
 </template>
 
 <script setup>
+import { computed } from "vue"
 import AppMain from "@/layout/AppMain/index.vue"
+import Navbar from "@/layout/Navbar/index.vue"
 import Sidebar from "@/layout/Sidebar/index.vue"
 import TagsView from "@/layout/TagsView/index.vue"
 import TopNavbar from "@/layout/TopNavbar/index.vue"
+import { useAppConfigStore } from "@/stores/appConfigStore.js"
 
-const classObj = () => {
+const appConfigStore = useAppConfigStore()
+const sidebarClass = computed(() => {
     return {
-        hideSidebar: true,
-        openSidebar: false,
-        withoutAnimation: false
+        collapse: appConfigStore.sideBar.collapse
     }
-}
-
-const handleClickOutSide = () => {
-
-}
+})
 </script>
 
 <style scoped>
@@ -45,20 +43,16 @@ const handleClickOutSide = () => {
         display: flex;
         position: relative;
 
-        .drawer-wrapper {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            background-color: #000000;
-            opacity: 0.3;
-        }
-
         .sidebar-container {
             width: var(--sidebar-container-width);
             height: 100%;
             flex-shrink: 0;
             background-color: var(--sidebar-container-background-color);
             transition: var(--sidebar-container-transition);
+
+            &.collapse {
+                width: var(--sidebar-container-collapse-width);
+            }
         }
 
         .main-container {

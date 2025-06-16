@@ -43,17 +43,25 @@ a:hover {
     --top-navbar-user-name-margin-right: 18px;
     /* 侧边栏 */
     --sidebar-container-width: 200px;
+    --sidebar-container-collapse-width: #f5f7fa;
     --sidebar-container-background-color: #ffffff;
     --sidebar-container-transition: width 0.28s;
     /* 侧边栏菜单 */
     --sidebar-icon-width: 16px;
     --sidebar-icon-height: 16px;
     --sidebar-icon-margin-right: 8px;
+    /* 导航栏 */
+    --navbar-container-height: 40px;
+    --navbar-container-padding: 0 15px;
+    /* 导航栏侧边栏折叠按钮 */
+    --navbar-sidebar-collapsed-width: 20px;
+    --navbar-sidebar-collapsed-height: 20px;
+    --navbar-sidebar-collapsed-margin-right: 10px;
     /* 标签页 */
     --tags-view-container-height: 40px;
     --tags-view-container-background-color: #ffffff;
     --tags-view-container-border-bottom: 1px solid #d8dce5;
-    --tags-view-container-box-shadow: 0 1px 3px 0 #0000001e, 0 0 3px 0 #0000000a;
+    --tags-view-container-box-shadow: 0 0px 3px 0 #0000001e, 0 0 3px 0 #0000000a;
     /* 标签页项 */
     --tags-view-item-width: 20px;
     --tags-view-item-height: 28px;

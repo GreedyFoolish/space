@@ -1,6 +1,6 @@
 <template>
     <el-scrollbar>
-        <el-menu mode="vertical">
+        <el-menu :collapse="appConfig.sideBar.collapse" mode="vertical">
             <SidebarItem
                 v-for="(item, index) in topMenu"
                 :key="`menu-item-${item.id || index}`"

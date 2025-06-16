@@ -17,6 +17,8 @@ const props = defineProps({
     }
 })
 
+const appConfigStore = useAppConfigStore()
+
 const renderedNodes = computed(() => {
     const nodes = []
     // 添加图标
@@ -35,6 +37,10 @@ const renderedNodes = computed(() => {
     }
     // 添加标题
     if (props.title) {
+        if (props.icon === "House" && appConfigStore.sideBar.collapse) {
+            // 侧边栏折叠时，展示首页图标不渲染标题
+            return nodes
+        }
         const title = props.title
         const spanProps = {
             class: "sidebar-title",

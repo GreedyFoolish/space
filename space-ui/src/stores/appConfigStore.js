@@ -9,6 +9,9 @@ export const useAppConfigStore = defineStore("appConfig", {
             visibleNumber: 5,
             show: true,
             currentMenu: null
+        },
+        sideBar: {
+            collapse: false
         }
     })
 })
