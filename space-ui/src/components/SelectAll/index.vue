@@ -120,6 +120,9 @@ const buildFullSelection = () => {
 
 // 构建非全选项的选中选项
 const buildNormalSelection = (values) => {
+    if (!Array.isArray(values)) {
+        return []
+    }
     return values.filter(v => v !== props.selectAllValue)
 }
 
@@ -163,16 +166,15 @@ const handleChange = (value) => {
 }
 
 watch(() => props.modelValue, (newValue) => {
-    if (!newValue && !Array.isArray(newValue) && typeof newValue !== "string") {
-        throw new Error("modelValue必须是数组或字符串")
-    }
     // 初始化值
     let initValues = []
     // 处理初始化值
     if (Array.isArray(newValue)) {
         initValues = [...newValue]
-    } else {
+    } else if (typeof newValue === "string") {
         initValues = [newValue]
+    } else {
+        throw new Error("modelValue 必须是数组或字符串")
     }
     // 获取非全选项的初始化值
     const filteredInit = buildNormalSelection(initValues)
