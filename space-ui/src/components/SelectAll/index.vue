@@ -98,75 +98,93 @@ const props = defineProps({
         default: () => []
     }
 })
+
 const emit = defineEmits(["update:modelValue", "change"])
+
 const selectedValues = ref([])
+// 用于记录是否全选状态
 const allSelected = ref(false)
+
 const allOptions = computed(() => {
     return props.options.filter(item => item.value !== props.selectAllValue)
 })
+
 const allOptionsValue = computed(() => {
     return allOptions.value.map(item => item.value)
 })
+
+// 构建全部选中选项
+const buildFullSelection = () => {
+    return [props.selectAllValue, ...allOptionsValue.value]
+}
+
+// 构建非全选项的选中选项
+const buildNormalSelection = (values) => {
+    return values.filter(v => v !== props.selectAllValue)
+}
+
 const handleChange = (value) => {
+    // 初始化选中值
+    let newSelected = []
     // 获取非全选项的选中值
-    const allValue = value.filter(item => item !== props.selectAllValue)
+    const allNormalValue = buildNormalSelection(value)
+    // 更新选中选项及全选状态
     if (value.includes(props.selectAllValue)) {
-        // 选中值中包含全选项
+        // 选中选项中包含全选项
         if (allSelected.value) {
             // 全选状态下，则切换到非全选状态并更新选中选项
-            selectedValues.value = allValue
+            newSelected = allNormalValue
             allSelected.value = false
         } else {
             // 非全选状态下，则切换到全选状态并选中全部选项
-            selectedValues.value = [props.selectAllValue, ...allOptionsValue.value]
+            newSelected = buildFullSelection()
             allSelected.value = true
         }
     } else {
-        // 选中的值中不包含全选项
+        // 选中选项中不包含全选项
         if (props.invert && allSelected.value) {
             // 设置反选选项且全选状态下，则切换到非全选状态并清空选中选项
-            selectedValues.value = []
+            newSelected = []
             allSelected.value = false
-        } else if (allValue.length === allOptions.value.length) {
+        } else if (allNormalValue.length === allOptions.value.length) {
             // 非全选状态下且选中的值与全选项的值一致，则切换到全选状态并选中全部选项
-            selectedValues.value = [props.selectAllValue, ...allOptionsValue.value]
+            newSelected = buildFullSelection()
             allSelected.value = true
         } else {
             // 非全选状态下且选中的值与全选项的值不一致，则切换到非全选状态并更新选中选项
-            selectedValues.value = allValue
+            newSelected = allNormalValue
             allSelected.value = false
         }
     }
-    emit("update:modelValue", selectedValues.value.filter(item => item !== props.selectAllValue))
+    // 更新选中选项
+    selectedValues.value = newSelected
+    // 更新绑定值
+    emit("update:modelValue", newSelected.filter(v => v !== props.selectAllValue))
 }
 
 watch(() => props.modelValue, (newValue) => {
-    if (newValue instanceof Array) {
-        // 获取非全选项的初始化值
-        const allInit = newValue.filter(item => item !== props.selectAllValue)
-        if (allInit.length === allOptions.value.length || newValue.includes(props.selectAllValue)) {
-            // 初始化值的长度与全选项的值一致或存在全选项，则初始化为全选状态
-            selectedValues.value = [props.selectAllValue, ...allOptionsValue.value]
-            allSelected.value = true
-        } else {
-            // 初始化为非全选状态
-            selectedValues.value = newValue
-            allSelected.value = false
-        }
-    } else if (typeof newValue === "string") {
-        if ((allOptions.value.length === 1 && allOptionsValue.value.includes(newValue))
-            || newValue === props.selectAllValue
-        ) {
-            // 选项的长度为1且值为初始化值或初始化值为全选项，则初始化为全选状态
-            selectedValues.value = [props.selectAllValue, newValue]
-            allSelected.value = true
-        } else {
-            // 初始化为非全选状态
-            selectedValues.value = [newValue]
-            allSelected.value = false
-        }
-    } else {
+    if (!newValue && !Array.isArray(newValue) && typeof newValue !== "string") {
         throw new Error("modelValue必须是数组或字符串")
+    }
+    // 初始化值
+    let initValues = []
+    // 处理初始化值
+    if (Array.isArray(newValue)) {
+        initValues = [...newValue]
+    } else {
+        initValues = [newValue]
+    }
+    // 获取非全选项的初始化值
+    const filteredInit = buildNormalSelection(initValues)
+    // 初始化选项及全选状态
+    if (initValues.includes(props.selectAllValue) || (filteredInit.length === allOptions.value.length)) {
+        // 始化值存在全选项或初始化值的长度与全选项的值一致，则初始化为全选状态
+        selectedValues.value = buildFullSelection()
+        allSelected.value = true
+    } else {
+        // 初始化为非全选状态
+        selectedValues.value = filteredInit
+        allSelected.value = false
     }
 }, { immediate: true })
 </script>
