@@ -1,5 +1,6 @@
 package com.example.space.service.impl;
 
+import com.example.space.dto.SpaceNavDTO;
 import com.example.space.dto.SpaceNavTreeDTO;
 import com.example.space.repository.SpaceNavRepository;
 import com.example.space.service.SpaceNavService;
@@ -60,6 +61,11 @@ public class SpaceNavServiceImpl implements SpaceNavService {
         children.sort((o1, o2) -> Integer.compare(o1.getNavSort(), o2.getNavSort()));
         parent.setChildren(children);
         children.forEach(child -> buildChildren(child, parentToChildren));
+    }
+
+    @Override
+    public List<SpaceNavDTO> getNavsByUserId(Long userId) {
+        return spaceNavRepository.getAllNavs();
     }
 
 }

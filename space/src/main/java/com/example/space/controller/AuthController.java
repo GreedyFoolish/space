@@ -54,9 +54,9 @@ public class AuthController {
     @Operation(summary = "用户登录", description = "通过用户名和密码获取 JWT")
     @ApiResponse(responseCode = "200", description = "成功返回 JWT")
     public ResponseEntity<Map<String, String>> login(
-        @Valid @Parameter(description = "用户信息") @RequestBody SpaceUser user,
         @Parameter(description = "验证码的key") @RequestHeader("X-Captcha-Key") String captchaKey,
-        @Parameter(description = "验证码的value") @RequestHeader("X-Captcha-Code") String captcha
+        @Parameter(description = "验证码的value") @RequestHeader("X-Captcha-Code") String captcha,
+        @Valid @Parameter(description = "用户信息") @RequestBody SpaceUser user
     ) {
         // 验证码校验
         if (captchaKey == null || captcha == null || !captchaService.validateCaptcha(captchaKey, captcha)) {
