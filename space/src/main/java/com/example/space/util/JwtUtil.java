@@ -24,13 +24,37 @@ public class JwtUtil {
      * @param role     用户角色
      * @return JWT 字符串
      */
-    public String generateToken(String username, String role) {
+    public String generateToken(Long userId, String username, String role) {
         return Jwts.builder()
-                .setSubject(username)
-                .claim("role", role)
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
+            .setSubject(username)
+            .claim("userId", userId)
+            .claim("role", role)
+            .setExpiration(new Date(System.currentTimeMillis() + expiration))
+            .signWith(SignatureAlgorithm.HS512, secret)
+            .compact();
+    }
+
+    /**
+     * 从 Token 中获取用户ID
+     *
+     * @param token JWT
+     * @return 用户ID
+     */
+    public Long getUserIdFromToken(String token) {
+        Object userId = Jwts.parser()
+            .setSigningKey(secret)
+            .parseClaimsJws(token)
+            .getBody()
+            .get("userId");
+
+        // 处理 userId 的类型，转换为 Long 类型。
+        if (userId instanceof Integer) {
+            return ((Integer) userId).longValue();
+        } else if (userId instanceof Long) {
+            return (Long) userId;
+        } else {
+            throw new IllegalArgumentException("不支持的userId类型");
+        }
     }
 
     /**
@@ -41,10 +65,10 @@ public class JwtUtil {
      */
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+            .setSigningKey(secret)
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
     }
 
     /**
@@ -55,10 +79,10 @@ public class JwtUtil {
      */
     public String getRoleFromToken(String token) {
         return (String) Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody()
-                .get("role");
+            .setSigningKey(secret)
+            .parseClaimsJws(token)
+            .getBody()
+            .get("role");
     }
 
     /**

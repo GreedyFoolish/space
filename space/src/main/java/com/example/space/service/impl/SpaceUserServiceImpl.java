@@ -103,6 +103,11 @@ public class SpaceUserServiceImpl implements SpaceUserService, UserDetailsServic
     }
 
     @Override
+    public List<SpaceUser> findByUserName(String userName) {
+        return spaceUserRepository.findByUserName(userName);
+    }
+
+    @Override
     public List<SpaceUserDTO> getAllUsers() {
         return spaceUserRepository.findAll()
             .stream()

@@ -25,6 +25,14 @@ public interface SpaceUserService {
     UserDetails loadUserByUsername(String username);
 
     /**
+     * 根据用户名查询用户
+     *
+     * @param userName 用户名
+     * @return 用户列表
+     */
+    List<SpaceUser> findByUserName(String userName);
+
+    /**
      * 查询所有用户
      *
      * @return 用户列表

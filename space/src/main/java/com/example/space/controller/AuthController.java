@@ -5,6 +5,7 @@ import com.example.space.exception.BusinessException;
 import com.example.space.model.ResponseEntity;
 import com.example.space.model.SpaceUser;
 import com.example.space.service.CaptchaService;
+import com.example.space.service.SpaceUserService;
 import com.example.space.util.JwtUtil;
 import com.example.space.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +33,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -46,6 +48,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private CaptchaService captchaService;
+    private SpaceUserService spaceUserService;
 
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "通过用户名和密码获取 JWT")
@@ -59,6 +62,13 @@ public class AuthController {
         if (captchaKey == null || captcha == null || !captchaService.validateCaptcha(captchaKey, captcha)) {
             throw new BusinessException(ResponseCodeEnum.CUSTOM_ERROR_1001.getCode(), "验证码错误");
         }
+        // 先根据用户名查询用户
+        List<SpaceUser> users = spaceUserService.findByUserName(user.getUserName());
+        if (users.isEmpty()) {
+            throw new BusinessException(ResponseCodeEnum.CUSTOM_ERROR_1005.getCode(), "用户不存在");
+        }
+        // 获取用户信息
+        SpaceUser dbUser = users.get(0);
         // 进行身份验证
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(user.getUserName(), user.getUserPassword())
@@ -69,9 +79,9 @@ public class AuthController {
         String role = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.joining(","));
-        logger.info("用户 {} 登录成功，角色权限为 {}", user.getUserName(), role);
+        logger.info("用户id {} 用户名 {} 登录成功，角色权限为 {}", dbUser.getId(), user.getUserName(), role);
         // 生成 JWT 令牌
-        String token = jwtUtil.generateToken(user.getUserName(), role);
+        String token = jwtUtil.generateToken(dbUser.getId(), user.getUserName(), role);
         // 返回包含令牌的响应
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
