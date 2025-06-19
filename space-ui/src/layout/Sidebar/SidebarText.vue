@@ -5,6 +5,7 @@
 <script setup>
 import { computed, h } from "vue"
 import { useAppConfigStore } from "@/stores/appConfigStore.js"
+import { getIcon } from "@/utils/iconUtils.js"
 
 const props = defineProps({
     icon: {
@@ -24,7 +25,7 @@ const renderedNodes = computed(() => {
     // 添加图标
     if (props.icon) {
         // 获取图标
-        const icon = useAppConfigStore().global.ElIconsVue[props.icon]
+        const icon = getIcon(props.icon)
         const iconProps = {
             class: "sidebar-icon",
             key: `icon-${props.title}-${props.icon}`

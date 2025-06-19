@@ -35,6 +35,7 @@ import router from "@/router/index.js"
 import { useAppConfigStore } from "@/stores/appConfigStore.js"
 import { usePermissionStore } from "@/stores/permissionStore.js"
 import { useTagsViewStore } from "@/stores/tagsView.js"
+import { getIcon } from "@/utils/iconUtils.js"
 import { customResolvePath } from "@/utils/pathUtils.js"
 import { throttle } from "@/utils/throttle.js"
 
@@ -46,14 +47,6 @@ const tagsViewContainer = ref(null)
 const selectedTag = ref(null)
 const menuStyle = ref({})
 const menuVisible = ref(false)
-const iconMap = computed(() => {
-    const icons = appConfigStore.global.ElIconsVue
-    // 创建一个浅引用的映射对象
-    return Object.entries(icons).reduce((acc, [key, value]) => {
-        acc[key] = shallowRef(value)
-        return acc
-    }, {})
-})
 const contextmenuList = ref([
     {
         name: "刷新页面",
@@ -123,15 +116,6 @@ const isActive = (tag) => {
 
 const isAffix = (tag) => {
     return tag?.meta?.affix
-}
-
-// 获取图标安全方法
-const getIcon = (iconName) => {
-    if (!iconName || !iconMap.value[iconName]) {
-        // 返回一个默认图标或返回null让组件处理
-        return null
-    }
-    return iconMap.value[iconName].value
 }
 
 // 处理菜单点击
