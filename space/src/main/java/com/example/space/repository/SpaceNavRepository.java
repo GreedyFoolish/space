@@ -1,5 +1,6 @@
 package com.example.space.repository;
 
+import com.example.space.dto.SpaceNavDTO;
 import com.example.space.dto.SpaceNavTreeDTO;
 import com.example.space.model.SpaceNav;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +17,11 @@ public interface SpaceNavRepository extends JpaRepository<SpaceNav, Long> {
         "LEFT JOIN SpaceRole sr ON srr.roleId.id = sr.id " +
         "WHERE sr.id = :roleId")
     List<SpaceNavTreeDTO> findUserNavsByRoleId(@Param("roleId") Long roleId);
+
+    @Query("SELECT NEW com.example.space.dto.SpaceNavDTO(sn.id, sn.parentId, sn.navName, sn.navUrl, sn.navIcon,sn.navType,sn.navComponent,sn.navSort) " +
+        "FROM SpaceNav sn " +
+        "WHERE (:status IS NULL OR sn.status IN :status) AND " +
+        "(COALESCE(:navName, '') = '' OR sn.navName LIKE %:navName%)")
+    List<SpaceNavDTO> getAllNavs(@Param("navName") String navName, @Param("status") List<Integer> status);
 
 }

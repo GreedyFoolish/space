@@ -64,8 +64,12 @@ public class SpaceNavServiceImpl implements SpaceNavService {
     }
 
     @Override
-    public List<SpaceNavDTO> getNavsByUserId(Long userId) {
-        return spaceNavRepository.getAllNavs();
+    public List<SpaceNavDTO> getNavsByUserId(Long userId, String navName, List<Boolean> status) {
+        // 将布尔值列表转换为整数列表
+        List<Integer> intStatus = status != null
+            ? status.stream().map(b -> b ? 0 : 1).toList()
+            : null;
+        return spaceNavRepository.getAllNavs(navName, intStatus);
     }
 
 }

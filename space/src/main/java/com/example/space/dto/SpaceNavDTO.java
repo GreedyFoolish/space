@@ -1,0 +1,47 @@
+package com.example.space.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class SpaceNavDTO {
+
+    @Schema(description = "导航ID")
+    private Long id;
+
+    @Schema(description = "父级导航ID")
+    private Long parentId;
+
+    @Schema(description = "导航名称")
+    private String navName;
+
+    @Schema(description = "导航跳转链接")
+    private String navUrl;
+
+    @Schema(description = "导航图标")
+    private String navIcon;
+
+    @Schema(description = "导航类型")
+    private String navType;
+
+    @Schema(description = "导航组件")
+    private String navComponent;
+
+    @Schema(description = "导航排序")
+    private int navSort;
+
+    public SpaceNavDTO(Long id, Long parentId, String navName, String navUrl, String navIcon,
+                       String navType, String navComponent, int navSort) {
+        this.id = id;
+        this.parentId = parentId;
+        this.navName = navName;
+        this.navUrl = navUrl;
+        this.navIcon = navIcon;
+        this.navType = navType;
+        this.navComponent = navComponent;
+        this.navSort = navSort;
+    }
+
+}
