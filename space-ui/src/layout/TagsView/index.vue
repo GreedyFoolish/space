@@ -312,7 +312,6 @@ watch(() => route.path, (newValue, oldValue) => {
     height: var(--tags-view-container-height);
     position: relative;
     background: var(--tags-view-container-background-color);
-    border-bottom: var(--tags-view-container-border-bottom);
     box-shadow: var(--tags-view-container-box-shadow);
 
     .tags-view-wrapper {

@@ -60,7 +60,6 @@ a:hover {
     /* 标签页 */
     --tags-view-container-height: 40px;
     --tags-view-container-background-color: #ffffff;
-    --tags-view-container-border-bottom: 1px solid #d8dce5;
     --tags-view-container-box-shadow: 0 0px 3px 0 #0000001e, 0 0 3px 0 #0000000a;
     /* 标签页项 */
     --tags-view-item-width: 20px;
@@ -100,7 +99,7 @@ a:hover {
     --tags-view-contextmenu-wrapper-background-color: #ffffff;
     --tags-view-contextmenu-wrapper-border-radius: 4px;
     --tags-view-contextmenu-wrapper-box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.1);
-    --tags-view-contextmenu-wrapper-z-index: 1;
+    --tags-view-contextmenu-wrapper-z-index: 9999;
     /* 标签页项关闭按钮contextmenu li */
     --tags-view-contextmenu-li-padding: 6px 12px;
     /* 标签页项关闭按钮contextmenu li hover */
@@ -109,4 +108,7 @@ a:hover {
     --tags-view-contextmenu-li-icon-width: 14px;
     --tags-view-contextmenu-li-icon-height: 14px;
     --tags-view-contextmenu-li-icon-margin-right: 6px;
+    /* 页面主体 */
+    --app-main-width: calc(100% - 5px);
+    --app-main-padding: 20px;
 }

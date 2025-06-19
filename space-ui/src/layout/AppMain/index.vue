@@ -22,6 +22,14 @@ const routeKey = computed(() => route.path)
 </script>
 
 <style scoped>
+.app-main {
+    width: var(--app-main-width);
+    height: calc(100vh - var(--top-navbar-height) - var(--navbar-container-height) - var(--tags-view-container-height));
+    padding: var(--app-main-padding);
+    overflow: auto;
+    box-sizing: border-box;
+}
+
 .fade-transform--move,
 .fade-transform-leave-active,
 .fade-transform-enter-active {
