@@ -1,12 +1,12 @@
 import axios from "axios"
-import {buildGetUrl, calculateByteLength, checkRepeatSubmit} from "@/utils/requestUtils.js"
-import {getToken} from "./auth"
+import { buildGetUrl, calculateByteLength, checkRepeatSubmit } from "@/utils/requestUtils.js"
+import { getToken } from "./auth"
 
 // 创建 axios 实例
 const service = axios.create({
     baseURL: import.meta.env.VITE_APP_BASE_API,
     timeout: 5000,
-    headers: {"Content-Type": "application/json;charset=utf-8"}
+    headers: { "Content-Type": "application/json;charset=utf-8" }
 })
 
 // 防重复提交限制配置
@@ -38,7 +38,7 @@ service.interceptors.request.use(
 
         // 处理 GET 请求参数
         if (config.method === "get" && config.params) {
-            config.url = buildGetUrl(config.baseURL, config.url, config.params)
+            config.url = buildGetUrl(config.url, config.params)
             config.params = {}
         }
 
@@ -86,9 +86,9 @@ service.interceptors.request.use(
 service.interceptors.response.use(
     response => {
         // 如果是图片等非 JSON 数据，直接放行
-        const contentType = response.headers["content-type"];
+        const contentType = response.headers["content-type"]
         if (contentType && contentType.includes("image/")) {
-            return response;
+            return response
         }
 
         const res = response.data

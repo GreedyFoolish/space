@@ -13,11 +13,10 @@ export function checkRepeatSubmit(config, requestObj, REPEAT_SUBMIT_INTERVAL = 1
     const sessionObj = cache.session.getJSON(sessionKey)
 
     if (sessionObj) {
-        const {data: s_data, time: s_time, url: s_url} = sessionObj
+        const { data: s_data, time: s_time, url: s_url } = sessionObj
         if (
-            s_data === requestObj.data &&
-            requestObj.time - s_time <= REPEAT_SUBMIT_INTERVAL &&
-            s_url === requestObj.url
+            s_data === requestObj.data && s_url === requestObj.url
+            && requestObj.time - s_time <= REPEAT_SUBMIT_INTERVAL
         ) {
             const message = "数据正在处理，请勿重复提交"
             console.warn(`[${s_url}]: ` + message)
@@ -31,19 +30,42 @@ export function checkRepeatSubmit(config, requestObj, REPEAT_SUBMIT_INTERVAL = 1
 
 /**
  * 构建 GET 请求 URL（自动处理 baseURL 和 params）
- * @param {string} baseURL 请求的 baseURL
  * @param {string} url 请求的 URL
  * @param {object} params 请求的参数
  * @returns {string} 构建后的 URL
  */
-export function buildGetUrl(baseURL, url, params) {
-    const fullUrl = new URL(url, baseURL)
-    Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
-            fullUrl.searchParams.append(key, value)
+export function buildGetUrl(url, params) {
+    // 参数校验是否有效（排除 undefined、null、NaN、Infinity、-Infinity）
+    const isValidValue = (val) => {
+        if (typeof val === "number") {
+            // 判断是否为有限数字
+            return Number.isFinite(val)
         }
-    })
-    return fullUrl.pathname + fullUrl.search
+        return val !== undefined && val !== null
+    }
+    // 参数编码
+    const encodeParam = (key, value) => {
+        const encodedKey = encodeURIComponent(key)
+        if (Array.isArray(value)) {
+            return `${encodedKey}=${value.map(encodeURIComponent).join(",")}`
+        } else if (typeof value === "object") {
+            // 对象不做处理，避免出现 [object Object]
+            return null
+        } else if (typeof value === "boolean") {
+            // 显式转为字符串，便于理解
+            return `${encodedKey}=${String(value)}`
+        } else {
+            return `${encodedKey}=${encodeURIComponent(value)}`
+        }
+    }
+    // 处理并编码所有有效参数
+    const validParams = Object.entries(params)
+        .filter(([_, value]) => isValidValue(value))
+        .map(([key, value]) => encodeParam(key, value))
+    // 构建查询字符串
+    const queryString = validParams.length > 0 ? `?${validParams.join("&")}` : ""
+    // 返回构建后的 URL
+    return url + queryString
 }
 
 /**
