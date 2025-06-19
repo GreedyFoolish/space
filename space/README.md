@@ -57,3 +57,27 @@ src
 - **包结构一致性**：测试代码的包结构应与主代码保持一致，便于定位和维护。
 - **分层清晰**：按照MVC或分层架构设计，将代码按功能模块划分到不同目录。
 - **配置分离**：可以为不同环境（如开发、测试、生产）创建独立的配置文件，如`application-dev.yml`、`application-prod.yml`。
+
+### 4. 参数顺序
+
+在定义`Spring MVC`控制器方法的参数时，虽然参数顺序通常不会影响功能的正确性，但为了提高代码可读性和团队协作的一致性，推荐遵循一定的顺序规范。以下是一个推荐顺序：
+
+1. `@RequestParam`：用于绑定 URL 查询参数或表单提交数据。
+2. `@RequestHeader`：用于绑定请求头信息。
+3. `@CookieValue`：用于绑定 Cookie 值。
+4. `@PathVariable`：用于绑定 URI 模板变量。
+5. `@RequestBody`：用于绑定请求体（通常是 JSON 或 XML 数据）。
+
+```java
+// 示例
+@PostMapping("/example")
+public ResponseEntity<String> exampleMethod(
+    @RequestParam String param,
+    @RequestHeader("User-Agent") String userAgent,
+    @CookieValue(value = "JSESSIONID", required = false) String sessionId,
+    @PathVariable String id,
+    @RequestBody RequestDTO requestDTO) {
+
+    // 方法体
+}
+```
