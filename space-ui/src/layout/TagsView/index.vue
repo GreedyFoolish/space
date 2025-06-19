@@ -28,11 +28,10 @@
 </template>
 
 <script setup>
-import { ref, computed, shallowRef, onMounted, onBeforeUnmount, watch } from "vue"
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue"
 import { useRoute } from "vue-router"
 import ScrollPane from "@/layout/TagsView/ScrollPane.vue"
 import router from "@/router/index.js"
-import { useAppConfigStore } from "@/stores/appConfigStore.js"
 import { usePermissionStore } from "@/stores/permissionStore.js"
 import { useTagsViewStore } from "@/stores/tagsView.js"
 import { getIcon } from "@/utils/iconUtils.js"
@@ -40,7 +39,6 @@ import { customResolvePath } from "@/utils/pathUtils.js"
 import { throttle } from "@/utils/throttle.js"
 
 const route = useRoute()
-const appConfigStore = useAppConfigStore()
 const permissionStore = usePermissionStore()
 const tagsViewStore = useTagsViewStore()
 const tagsViewContainer = ref(null)

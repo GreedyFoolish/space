@@ -64,8 +64,8 @@ const ruleForm = reactive({
 })
 
 const rules = reactive({
-    userName: [{ validator: validateName, trigger: ["blur","change"] }],
-    password: [{ validator: validatePass, trigger: ["blur","change"] }]
+    userName: [{ validator: validateName, trigger: ["blur", "change"] }],
+    password: [{ validator: validatePass, trigger: ["blur", "change"] }]
 })
 
 let lastClickTime = 0
