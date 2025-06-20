@@ -158,7 +158,7 @@ const fullName = computed(() => `${form.firstName} ${form.lastName}`)
     * 命名建议以`validate`开头，例如：`validateName`，`validateEmail`。
 3. 表单验证规则（`Validation Rules`）
     * 表单字段级别的验证函数，用于被规则调用。
-    * 命名建议以`validate`开头，例如：`validateName`，`validateEmail`。
+    * 建议使用对象形式定义验证规则，如：`{ required: true, message: "Name is required" }`。
 4. 表单操作函数（`Form Operations`）
     * 对表单整体的操作，如重置、提交、初始化等。
     * 命名建议语义清晰，动词开头，例如：`resetForm`，`submitForm`。
