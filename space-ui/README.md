@@ -150,21 +150,21 @@ const fullName = computed(() => `${form.firstName} ${form.lastName}`)
 
 **具体功能分组：**
 
-1. 事件处理函数（`Event Handlers`）
+1. 辅助函数（`Helper Functions`）
+    * 非事件处理，表单相关的通用工具函数。
+    * 建议使用对象形式定义辅助函数，如：`isMenu`。
+2. 事件处理函数（`Event Handlers`）
     * 定义用户交互行为，如点击、输入等。
     * 命名建议以`handle`开头，例如：`handleAdd`，`handleEdit`。
-2. 验证函数（`Validation Functions`）
+3. 验证函数（`Validation Functions`）
     * 表单字段级别的验证函数，用于被规则调用。
     * 命名建议以`validate`开头，例如：`validateName`，`validateEmail`。
-3. 表单验证规则（`Validation Rules`）
+4. 表单验证规则（`Validation Rules`）
     * 表单字段级别的验证函数，用于被规则调用。
     * 建议使用对象形式定义验证规则，如：`{ required: true, message: "Name is required" }`。
-4. 表单操作函数（`Form Operations`）
+5. 表单操作函数（`Form Operations`）
     * 对表单整体的操作，如重置、提交、初始化等。
     * 命名建议语义清晰，动词开头，例如：`resetForm`，`submitForm`。
-5. 其他辅助函数（`Helper Functions`）
-    * 非表单相关的通用工具函数。
-    * 命名建议语义清晰，动词开头，例如：`getIcon`，`formatDate`。
 
 ```javascript
 function handleSubmit() {
@@ -242,8 +242,8 @@ defineExpose({
 
     // 8. Methods
     function handleSubmit() {
-    emit("submit");
-}
+        // ...
+    }
 
     // 9. Lifecycle
     onMounted(() => {
