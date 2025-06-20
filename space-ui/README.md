@@ -68,7 +68,7 @@ import { defineProps, defineEmits, ref, reactive, computed, watch, h } from "vue
 ### 2.1 导入语句（Imports）
 
 * 首先引入所有依赖项，如`ref`,`reactive`,`computed`等。
-* 按照模块来源排序：Vue 内置 API > 第三方库 > 本地组件/工具函数。
+* 按照模块来源排序：`Vue`内置`API` > 第三方库 > 本地组件/工具函数。
 
 ```javascript
 import { ref, reactive, computed } from "vue"
@@ -102,7 +102,24 @@ const props = defineProps({
 const emit = defineEmits(["update:title", "submit"])
 ```
 
-### 2.4 响应式状态（Reactive State）
+### 2.4 普通变量声明（const,let）
+
+* 使用`const`或`let`定义组件内部的变量。
+* 按逻辑分组，优先级高的变量靠前。
+
+```javascript
+const count = 1
+```
+
+### 2.5 模板引用（Template Refs）
+
+* 使用`ref`在模板中绑定`DOM`或子组件实例。
+
+```javascript
+const inputRef = ref()
+```
+
+### 2.6 响应式状态（Reactive State）
 
 * 使用`ref`或`reactive`定义组件内部的状态变量。
 * 按逻辑分组，优先级高的状态靠前。
@@ -116,28 +133,38 @@ const form = reactive({
 })
 ```
 
-### 2.5 计算属性（Computed Properties）
+### 2.7 计算属性（Computed Properties）
 
 * 使用`computed`定义派生状态。
+* 按逻辑分组，命名清晰。
 
 ```javascript
 const fullName = computed(() => `${form.firstName} ${form.lastName}`)
 ```
 
-### 2.6 生命周期钩子（Lifecycle Hooks）
-
-* 按执行顺序排列：`onBeforeMount`，`onMounted`，`onBeforeUpdate`，`onUpdated`，`onUnmounted`等。
-
-```javascript
-onMounted(() => {
-    fetchData()
-})
-```
-
-### 2.7 方法定义（Methods / Functions）
+### 2.8 方法定义（Methods / Functions）
 
 * 定义组件中使用的函数或事件处理逻辑。
+* 建议使用驼峰命名法，如`handleAdd`、`handleEdit`等。
 * 按功能分组，命名清晰，动词开头。
+
+**具体功能分组：**
+
+1. 事件处理函数（`Event Handlers`）
+    * 定义用户交互行为，如点击、输入等。
+    * 命名建议以`handle`开头，例如：`handleAdd`，`handleEdit`。
+2. 验证函数（`Validation Functions`）
+    * 表单字段级别的验证函数，用于被规则调用。
+    * 命名建议以`validate`开头，例如：`validateName`，`validateEmail`。
+3. 表单验证规则（`Validation Rules`）
+    * 表单字段级别的验证函数，用于被规则调用。
+    * 命名建议以`validate`开头，例如：`validateName`，`validateEmail`。
+4. 表单操作函数（`Form Operations`）
+    * 对表单整体的操作，如重置、提交、初始化等。
+    * 命名建议语义清晰，动词开头，例如：`resetForm`，`submitForm`。
+5. 其他辅助函数（`Helper Functions`）
+    * 非表单相关的通用工具函数。
+    * 命名建议语义清晰，动词开头，例如：`getIcon`，`formatDate`。
 
 ```javascript
 function handleSubmit() {
@@ -150,21 +177,17 @@ async function fetchData() {
 }
 ```
 
-### 2.8 暴露给父组件的方法或变量（Expose）
+### 2.9 生命周期钩子（Lifecycle Hooks）
 
-* 使用`defineExpose`显式暴露子组件的方法或属性。
+* 按执行顺序排列：`onBeforeMount`，`onMounted`，`onBeforeUpdate`，`onUpdated`，`onUnmounted`等。
 
 ```javascript
-const publicMethod = () => {
-// ...
-}
-
-defineExpose({
-    publicMethod
+onMounted(() => {
+    fetchData()
 })
 ```
 
-### 2.9 侦听器（Watchers）
+### 2.10 侦听器（Watchers）
 
 * 使用`watch`或`watchEffect`监听响应式数据的变化。
 
@@ -177,12 +200,19 @@ watch(
 )
 ```
 
-### 2.10 模板引用（Template Refs）
+### 2.11 暴露给父组件的方法或变量（Expose）
 
-* 使用`ref`在模板中绑定`DOM`或子组件实例。
+* 使用`defineExpose`显式暴露子组件的方法或属性。
+* 建议使用对象形式定义暴露的属性和方法。
 
 ```javascript
-const inputRef = ref()
+const publicMethod = () => {
+// ...
+}
+
+defineExpose({
+    publicMethod
+})
 ```
 
 ### 示例代码
@@ -190,38 +220,43 @@ const inputRef = ref()
 ```javascript
 <script setup>
     // 1. Imports
-    import MyComponent from "./MyComponent.vue"
+    import {ref} from "vue";
 
     // 2. Props
-    const props = defineProps({ /* ... */})
+    const props = defineProps({ /* ... */});
 
     // 3. Emits
-    const emit = defineEmits(["submit"])
+    const emit = defineEmits(["submit"]);
 
-    // 4. Reactive State
-    const count = ref(0)
-    const form = reactive({})
+    // 4. Const/Let
+    const count = 0;
 
-    // 5. Computed
-    const fullName = computed(() => "")
+    // 5. Template Refs
+    const inputRef = ref();
 
-    // 6. Lifecycle Hooks
-    onMounted(() => {
-    })
+    // 6. Reactive State
+    const form = reactive({});
 
-    // 7. Methods
+    // 7. Computed
+    const fullName = computed(() => "");
+
+    // 8. Methods
     function handleSubmit() {
-        emit("submit")
-    }
+    emit("submit");
+}
 
-    // 8. Expose
-    defineExpose({})
+    // 9. Lifecycle
+    onMounted(() => {
+        // ...
+    });
 
-    // 9. Watchers
+    // 10. Watchers
     watch(() => props.items, () => {
-    })
+        // ...
+    });
 
-    // 10. Template Refs
-    const inputRef = ref()
+    // 11. Expose
+    defineExpose({});
+
 </script>
 ```
