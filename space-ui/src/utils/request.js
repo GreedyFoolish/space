@@ -1,6 +1,7 @@
 import axios from "axios"
+import router from "@/router/index.js";
 import { buildGetUrl, calculateByteLength, checkRepeatSubmit } from "@/utils/requestUtils.js"
-import { getToken } from "./auth"
+import { getToken, removeToken } from "./auth"
 
 // 创建 axios 实例
 const service = axios.create({
@@ -100,6 +101,17 @@ service.interceptors.response.use(
         }
     },
     error => {
+        // 检查是否为 401 Unauthorized 错误
+        if (error.response && error.response.status === 401
+            && error.response.statusText === "Unauthorized"
+        ) {
+            // 清除 token
+            removeToken()
+            // 跳转到登录页面
+            router.push("/login");
+            return Promise.resolve()
+        }
+
         console.error("Response Error:", error.message)
         return Promise.reject(error)
     }
