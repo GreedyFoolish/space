@@ -17,8 +17,8 @@
                 ></SelectAll>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="getList">查询</el-button>
-                <el-button @click="resetForm(queryFormRef)">重置</el-button>
+                <el-button type="primary" @click="handleQuery">查询</el-button>
+                <el-button @click="resetQuery">重置</el-button>
             </el-form-item>
         </el-form>
 
@@ -44,8 +44,8 @@
             <el-table-column prop="navUrl" label="组件路径" sortable />
             <el-table-column prop="status" label="状态" align="center">
                 <template #default="scope">
-                    <el-tag :type="scope.row.status === 0 ? 'success' : 'danger'">
-                        {{ scope.row.status === 0 ? "启用" : "禁用" }}
+                    <el-tag :type="scope.row.status === true ? 'primary' : 'danger'">
+                        {{ scope.row.status === true ? "启用" : "禁用" }}
                     </el-tag>
                 </template>
             </el-table-column>
@@ -85,7 +85,15 @@
                 <el-row>
                     <el-col :span="24">
                         <el-form-item label="菜单类型" prop="navType">
-                            <el-input v-model="editForm.navType" placeholder="请输入菜单类型"></el-input>
+                            <el-radio-group v-model="editForm.navType">
+                                <el-radio
+                                    v-for="item in menuTypeList"
+                                    :key="item.value"
+                                    :label="item.value"
+                                >
+                                    {{ item.label }}
+                                </el-radio>
+                            </el-radio-group>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -107,9 +115,9 @@
                             <el-input v-model="editForm.navName" placeholder="请输入菜单名称"></el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="12" v-if="isMenu">
-                        <el-form-item label="路由名称" prop="navName">
-                            <el-input v-model="editForm.navName" placeholder="请输入路由名称"></el-input>
+                    <el-col :span="12" v-if="isMenu()">
+                        <el-form-item label="路由名称" prop="navRouteName">
+                            <el-input v-model="editForm.navRouteName" placeholder="请输入路由名称"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -123,8 +131,13 @@
                                 是否外链
                             </template>
                             <el-radio-group v-model="editForm.isFrame">
-                                <el-radio label="0">是</el-radio>
-                                <el-radio label="1">否</el-radio>
+                                <el-radio
+                                    v-for="item in frameList"
+                                    :key="item.value"
+                                    :label="item.value"
+                                >
+                                    {{ item.label }}
+                                </el-radio>
                             </el-radio-group>
                         </el-form-item>
                     </el-col>
@@ -141,7 +154,7 @@
                     </el-col>
                 </el-row>
                 <el-row>
-                    <el-col :span="12" v-if="isMenu">
+                    <el-col :span="12" v-if="isMenu()">
                         <el-form-item prop="navComponent">
                             <template #label>
                                 <el-tooltip
@@ -155,7 +168,7 @@
                             <el-input v-model="editForm.navComponent" placeholder="请输入组件路径" />
                         </el-form-item>
                     </el-col>
-                    <el-col :span="12" v-if="isMenu">
+                    <el-col :span="12" v-if="isMenu()">
                         <el-form-item prop="isCache">
                             <template #label>
                                 <el-tooltip
@@ -187,7 +200,7 @@
                                 </el-tooltip>
                                 显示状态
                             </template>
-                            <el-radio-group v-model="editForm.visible">
+                            <el-radio-group v-model="editForm.isVisible">
                                 <el-radio
                                     v-for="item in visibleList"
                                     :key="item.value"
@@ -234,8 +247,32 @@ import { ref, reactive, onMounted } from "vue"
 import { getMenuList } from "@/api/system/menu.js"
 import SelectAll from "@/components/SelectAll/index.vue"
 import { getIcon } from "@/utils/iconUtils.js"
-import { buildTreeData, findTreeNodeByKey } from "@/utils/treeUtils.js";
+import { buildTreeData, findTreeNodeByKey } from "@/utils/treeUtils.js"
 
+const menuTypeList = [
+    {
+        label: "顶部导航",
+        value: "topNavbar"
+    },
+    {
+        label: "目录",
+        value: "catalogue"
+    },
+    {
+        label: "菜单",
+        value: "menu"
+    }
+]
+const frameList = [
+    {
+        label: "外链",
+        value: true
+    },
+    {
+        label: "非外链",
+        value: false
+    }
+]
 const cacheList = [
     {
         label: "缓存",
@@ -281,14 +318,23 @@ const queryForm = reactive({
 })
 const editForm = ref({})
 
-const isMenu = (form = editForm) => {
+const isMenu = (form = editForm.value) => {
     return form?.navType === "menu"
+}
+
+const handleQuery = () => {
+    getList()
+}
+
+const resetQuery = () => {
+    resetForm(queryFormRef.value)
+    handleQuery()
 }
 
 const handleAdd = () => {
     title.value = "新增"
+    resetFormData()
     dialogVisible.value = true
-    resetForm(editFormRef.value)
 }
 
 const toggleExpandAll = () => {
@@ -343,34 +389,56 @@ const submitForm = () => {
 }
 
 const cancel = () => {
+    resetFormData()
     dialogVisible.value = false
-    resetForm(editFormRef.value)
 }
 
 const resetForm = (formRef) => {
     formRef?.resetFields()
 }
 
+const resetFormData = () => {
+    editForm.value = {
+        parentNavName: "主目录",
+        navType: "menu",
+        isFrame: false,
+        isCache: false,
+        isVisible: true,
+        status: true
+    }
+}
+
 const getList = () => {
     queryFormRef.value.validate((valid) => {
         if (valid) {
-            console.log("submitForm", queryForm)
             getMenuList(queryForm).then((res) => {
-                treeData.value = [{
-                    id: 0,
-                    navName: "主目录",
-                    navSort: 0,
-                    navType: "root",
-                    children: buildTreeData(res.data)
-                }]
+                res.data.map((item) => {
+                    if (item.parentNavName === null) {
+                        item.parentNavName = "主目录"
+                    }
+                    return item
+                })
                 tableData.value = res.data
             })
         }
     })
 }
 
+const getTreeList = () => {
+    getMenuList().then((res) => {
+        treeData.value = [{
+            id: 0,
+            navName: "主目录",
+            navSort: 0,
+            navType: "root",
+            children: buildTreeData(res.data)
+        }]
+    })
+}
+
 onMounted(() => {
     getList()
+    getTreeList()
 })
 </script>
 
