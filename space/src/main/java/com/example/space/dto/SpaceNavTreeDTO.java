@@ -8,45 +8,30 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SpaceNavTreeDTO {
-
-    @Schema(description = "导航ID")
-    private Long id;
-
-    @Schema(description = "父级导航ID")
-    private Long parentId;
-
-    @Schema(description = "导航名称")
-    private String navName;
-
-    @Schema(description = "导航跳转链接")
-    private String navUrl;
-
-    @Schema(description = "导航图标")
-    private String navIcon;
-
-    @Schema(description = "导航类型")
-    private String navType;
-
-    @Schema(description = "导航组件")
-    private String navComponent;
-
-    @Schema(description = "导航排序")
-    private int navSort;
+public class SpaceNavTreeDTO extends BaseSpaceNavDTO {
 
     @Schema(description = "子导航信息")
     private List<SpaceNavTreeDTO> children;
 
-    public SpaceNavTreeDTO(Long id, Long parentId, String navName, String navUrl, String navIcon,
-                           String navType, String navComponent, int navSort) {
-        this.id = id;
-        this.parentId = parentId;
-        this.navName = navName;
-        this.navUrl = navUrl;
-        this.navIcon = navIcon;
-        this.navType = navType;
-        this.navComponent = navComponent;
-        this.navSort = navSort;
+    public SpaceNavTreeDTO(
+        Long id, Long parentId, String navType, String navName, String navRouteName,
+        int isFrame, String navUrl, String navIcon, int isCache, String navComponent,
+        int isVisible, int navSort, int status
+    ) {
+        super();
+        this.setId(id);
+        this.setParentId(parentId);
+        this.setNavType(navType);
+        this.setNavName(navName);
+        this.setNavRouteName(navRouteName);
+        this.setFrame(isFrame == 1);
+        this.setNavUrl(navUrl);
+        this.setNavIcon(navIcon);
+        this.setCache(isCache == 1);
+        this.setNavComponent(navComponent);
+        this.setVisible(isVisible == 1);
+        this.setNavSort(navSort);
+        this.setStatus(status == 0);
     }
 
 }
