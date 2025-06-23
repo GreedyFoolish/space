@@ -52,4 +52,24 @@ public class BaseSpaceNavDTO {
     @Schema(description = "状态标志，false-正常，true-删除。默认值为false")
     private boolean status = false;
 
+    public BaseSpaceNavDTO(
+        Long id, Long parentId, String navType, String navName, String navRouteName,
+        boolean isFrame, String navUrl, String navIcon, boolean isCache, String navComponent,
+        boolean isVisible, int navSort, boolean status
+    ) {
+        this.id = id;
+        this.parentId = parentId;
+        this.navType = navType;
+        this.navName = navName;
+        this.navRouteName = navRouteName;
+        this.isFrame = isFrame;
+        this.navUrl = navUrl;
+        this.navIcon = navIcon;
+        this.isCache = isCache;
+        this.navComponent = navComponent;
+        this.isVisible = isVisible;
+        this.navSort = navSort;
+        this.status = status;
+    }
+
 }
