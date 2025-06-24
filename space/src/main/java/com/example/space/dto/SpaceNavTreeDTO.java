@@ -13,6 +13,10 @@ public class SpaceNavTreeDTO extends BaseSpaceNavDTO {
     @Schema(description = "子导航信息")
     private List<SpaceNavTreeDTO> children;
 
+    public SpaceNavTreeDTO() {
+        super();
+    }
+
     public SpaceNavTreeDTO(
         Long id, Long parentId, String navType, String navName, String navRouteName,
         int isFrame, String navUrl, String navIcon, int isCache, String navComponent,

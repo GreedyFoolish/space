@@ -1,4 +1,4 @@
-package com.example.space.dto;
+package com.example.space.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,8 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Schema(description = "基础导航信息")
-public class BaseSpaceNavDTO {
+public class BaseSpaceNavVO {
 
     @Schema(description = "导航ID")
     private Long id;
@@ -27,7 +26,7 @@ public class BaseSpaceNavDTO {
 
     @Schema(description = "是否外链，false-非外链，true-外链。默认值为false")
     @JsonProperty("isFrame")
-    private Boolean isFrame;
+    private Boolean isFrame = false;
 
     @Schema(description = "导航路由")
     private String navUrl;
@@ -37,43 +36,23 @@ public class BaseSpaceNavDTO {
 
     @Schema(description = "是否缓存，false-不缓存，true-缓存。默认值为false")
     @JsonProperty("isCache")
-    private Boolean isCache;
+    private Boolean isCache = false;
 
     @Schema(description = "导航组件")
     private String navComponent;
 
     @Schema(description = "显示状态，false-隐藏，true-显示。默认值为true")
     @JsonProperty("isVisible")
-    private Boolean isVisible;
+    private Boolean isVisible = true;
 
     @Schema(description = "导航排序，数值越小越靠前。默认值为50")
-    private int navSort;
+    private int navSort = 50;
 
     @Schema(description = "状态标志，false-正常，true-删除。默认值为false")
-    private Boolean status;
+    private Boolean status = false;
 
-    public BaseSpaceNavDTO() {
+    public BaseSpaceNavVO() {
 
-    }
-
-    public BaseSpaceNavDTO(
-        Long id, Long parentId, String navType, String navName, String navRouteName,
-        Boolean isFrame, String navUrl, String navIcon, Boolean isCache, String navComponent,
-        Boolean isVisible, int navSort, Boolean status
-    ) {
-        this.id = id;
-        this.parentId = parentId;
-        this.navType = navType;
-        this.navName = navName;
-        this.navRouteName = navRouteName;
-        this.isFrame = isFrame;
-        this.navUrl = navUrl;
-        this.navIcon = navIcon;
-        this.isCache = isCache;
-        this.navComponent = navComponent;
-        this.isVisible = isVisible;
-        this.navSort = navSort;
-        this.status = status;
     }
 
 }

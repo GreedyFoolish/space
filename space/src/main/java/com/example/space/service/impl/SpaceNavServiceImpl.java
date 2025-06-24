@@ -1,12 +1,18 @@
 package com.example.space.service.impl;
 
+import com.example.space.convert.SpaceNavConvertor;
 import com.example.space.dto.SpaceNavDTO;
 import com.example.space.dto.SpaceNavTreeDTO;
+import com.example.space.enums.ResponseCodeEnum;
+import com.example.space.exception.BusinessException;
+import com.example.space.model.SpaceNav;
 import com.example.space.repository.SpaceNavRepository;
 import com.example.space.service.SpaceNavService;
+import com.example.space.vo.SpaceNavVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,6 +76,23 @@ public class SpaceNavServiceImpl implements SpaceNavService {
             ? status.stream().map(b -> b ? 0 : 1).toList()
             : null;
         return spaceNavRepository.getAllNavs(navName, intStatus);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String addNavMenu(SpaceNavVO spaceNavVO, Long userId) {
+        if (spaceNavVO == null || spaceNavVO.getNavName().isEmpty()) {
+            throw new BusinessException(ResponseCodeEnum.CUSTOM_ERROR_1001.getCode(), "导航名称不能为空");
+        }
+        SpaceNav spaceNav = SpaceNavConvertor.INSTANCE.convertVoToEntity(spaceNavVO);
+        // 设置创建人和更新人
+        spaceNav.setCreateBy(userId);
+        spaceNav.setUpdateBy(userId);
+        // 保存实体到数据库
+        SpaceNav createNav = spaceNavRepository.save(spaceNav);
+        String message = createNav.getId() != null ? "导航添加成功" : "导航添加失败";
+        logger.warn("{}：{}", message, spaceNav.getNavName());
+        return message;
     }
 
 }

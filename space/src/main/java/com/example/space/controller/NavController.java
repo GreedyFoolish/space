@@ -6,10 +6,12 @@ import com.example.space.exception.BusinessException;
 import com.example.space.model.ResponseEntity;
 import com.example.space.service.SpaceNavService;
 import com.example.space.util.JwtUtil;
+import com.example.space.vo.SpaceNavVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -57,6 +59,31 @@ public class NavController {
         logger.info("搜索导航列表成功，结果：{}", navList);
         // 返回导航列表
         return ResponseEntity.custom(ResponseCodeEnum.SUCCESS.getCode(), ResponseCodeEnum.SUCCESS.getMessage(), navList);
+    }
+
+    @PostMapping
+    @Operation(summary = "添加导航菜单", description = "根据提供的导航信息添加新的导航菜单")
+    @ApiResponse(responseCode = "200", description = "成功添加导航菜单")
+    public ResponseEntity<String> addNavMenu(
+        @Parameter(description = "用户token") @RequestHeader("Authorization") String requestToken,
+        @RequestBody @Valid SpaceNavVO spaceNavVO
+    ) {
+        if (requestToken == null || !requestToken.startsWith("Bearer ")) {
+            throw new BusinessException(ResponseCodeEnum.CUSTOM_ERROR_1002.getCode(), "无效的token");
+        }
+
+        // 提取 token 和验证逻辑
+        String token = requestToken.substring(7);
+        if (!jwtUtil.validateToken(token)) {
+            throw new BusinessException(ResponseCodeEnum.CUSTOM_ERROR_1003.getCode(), "无效的token或token已过期");
+        }
+
+        // 获取用户ID
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        // 调用 service 层添加导航菜单
+        String result = spaceNavService.addNavMenu(spaceNavVO, userId);
+
+        return ResponseEntity.custom(ResponseCodeEnum.SUCCESS.getCode(), result, null);
     }
 
 }

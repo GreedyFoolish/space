@@ -2,6 +2,7 @@ package com.example.space.service;
 
 import com.example.space.dto.SpaceNavDTO;
 import com.example.space.dto.SpaceNavTreeDTO;
+import com.example.space.vo.SpaceNavVO;
 
 import java.util.List;
 
@@ -24,5 +25,14 @@ public interface SpaceNavService {
      * @return 符合条件的导航列表
      */
     List<SpaceNavDTO> getNavsByUserId(Long userId, String navName, List<Boolean> status);
+
+    /**
+     * 添加导航菜单
+     *
+     * @param spaceNavVO 导航菜单信息
+     * @param userId     用户ID
+     * @return 是否添加成功
+     */
+    String addNavMenu(SpaceNavVO spaceNavVO, Long userId);
 
 }
