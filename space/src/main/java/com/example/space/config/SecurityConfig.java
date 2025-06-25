@@ -3,12 +3,12 @@ package com.example.space.config;
 import com.example.space.entrypoint.JwtAuthenticationEntryPoint;
 import com.example.space.enums.RoleEnum;
 import com.example.space.handler.CustomAccessDeniedHandler;
+import com.example.space.security.PathAllowChecker;
 import com.example.space.service.SpaceUserService;
 import com.example.space.util.JwtUtil;
 import com.example.space.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -26,8 +26,7 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final SpaceUserService spaceUserService;
-    private final SecurityProperties securityProperties;
-    private final Environment environment;
+    private final PathAllowChecker pathAllowChecker;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final String[] SWAGGER_PATHS = new String[]{
@@ -39,14 +38,12 @@ public class SecurityConfig {
 
     public SecurityConfig(JwtUtil jwtUtil,
                           SpaceUserService spaceUserService,
-                          SecurityProperties securityProperties,
-                          Environment environment,
+                          PathAllowChecker pathAllowChecker,
                           CustomAccessDeniedHandler customAccessDeniedHandler,
                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
         this.jwtUtil = jwtUtil;
         this.spaceUserService = spaceUserService;
-        this.securityProperties = securityProperties;
-        this.environment = environment;
+        this.pathAllowChecker = pathAllowChecker;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
@@ -82,7 +79,7 @@ public class SecurityConfig {
                     ex.authenticationEntryPoint(jwtAuthenticationEntryPoint) // 认证失败处理器
                         .accessDeniedHandler(customAccessDeniedHandler) // 权限不足处理器
             )
-            .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, spaceUserService, securityProperties, environment), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, spaceUserService, pathAllowChecker), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
