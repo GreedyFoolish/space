@@ -33,9 +33,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        List<String> excludePathsList = Optional.ofNullable(securityProperties.getAllowedOriginList())
+        List<String> allowedOriginList = Optional.ofNullable(securityProperties.getAllowedOriginList())
             .orElse(Collections.emptyList());
-        String[] originsPaths = excludePathsList.toArray(String[]::new);
+        String[] originsPaths = allowedOriginList.toArray(String[]::new);
         logger.debug("添加跨域配置，允许的域：{}", Arrays.toString(originsPaths));
         registry.addMapping("/api/**")
             .allowedOrigins(originsPaths)

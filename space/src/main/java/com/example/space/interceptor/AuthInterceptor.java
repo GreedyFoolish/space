@@ -2,6 +2,7 @@ package com.example.space.interceptor;
 
 import com.example.space.enums.ResponseCodeEnum;
 import com.example.space.exception.BusinessException;
+import com.example.space.security.PathAllowChecker;
 import com.example.space.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,15 +15,20 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthInterceptor implements HandlerInterceptor {
     // 日志记录器
     private static final Logger logger = LoggerFactory.getLogger(AuthInterceptor.class);
-    // JWT工具类
     private final JwtUtil jwtUtil;
+    private final PathAllowChecker pathAllowChecker;
 
-    public AuthInterceptor(JwtUtil jwtUtil) {
+    public AuthInterceptor(JwtUtil jwtUtil, PathAllowChecker pathAllowChecker) {
         this.jwtUtil = jwtUtil;
+        this.pathAllowChecker = pathAllowChecker;
     }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        if (pathAllowChecker.isPathWhitelisted(request)) {
+            request.setAttribute("userId", 1L);
+            return true;
+        }
         // 获取请求头中的 Token 信息
         String requestToken = request.getHeader("Authorization");
         // 校验 Token 是否存在且格式正确

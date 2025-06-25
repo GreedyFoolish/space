@@ -1,7 +1,7 @@
 package com.example.space.filter;
 
-import com.example.space.config.SecurityProperties;
 import com.example.space.enums.RoleEnum;
+import com.example.space.security.PathAllowChecker;
 import com.example.space.service.SpaceUserService;
 import com.example.space.util.JwtUtil;
 import com.example.space.util.WebUtils;
@@ -10,8 +10,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,25 +23,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final SpaceUserService spaceUserService;
-    private final SecurityProperties securityProperties;
-    private final Environment environment;
+    private final PathAllowChecker pathAllowChecker;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil,
-                                   SpaceUserService spaceUserService,
-                                   SecurityProperties securityProperties,
-                                   Environment environment) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, SpaceUserService spaceUserService, PathAllowChecker pathAllowChecker) {
         this.jwtUtil = jwtUtil;
         this.spaceUserService = spaceUserService;
-        this.securityProperties = securityProperties;
-        this.environment = environment;
+        this.pathAllowChecker = pathAllowChecker;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String path = request.getRequestURI();
-        String referer = request.getHeader("Referer");
         // 不需要认证的接口
-        if (isPathAllowed(path, referer)) {
+        if (pathAllowChecker.isPathWhitelisted(request)) {
             // 设置匿名用户
             UsernamePasswordAuthenticationToken anonymousAuth = new UsernamePasswordAuthenticationToken(
                 "anonymousUser", null, AuthorityUtils.createAuthorityList(RoleEnum.ANONYMOUS.getAuthority())
@@ -79,22 +70,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 继续过滤链
         filterChain.doFilter(request, response);
-    }
-
-    private boolean isPathAllowed(String path, String referer) {
-        // 始终允许的路径
-        if (path.startsWith("/api/auth/") || path.startsWith("/api/user/register")) {
-            return true;
-        }
-        // 只在 dev 环境下启用 referer 白名单
-        boolean isDev = environment.acceptsProfiles(Profiles.of("dev"));
-        // 如果当前环境不是 dev，则不允许任何 referer
-        if (!isDev) {
-            return false;
-        }
-        // 判断 referer 是否在白名单中
-        return securityProperties.getAllowedRefererList() != null &&
-            securityProperties.getAllowedRefererList().contains(referer);
     }
 
 }
