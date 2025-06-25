@@ -62,22 +62,57 @@ src
 
 在定义`Spring MVC`控制器方法的参数时，虽然参数顺序通常不会影响功能的正确性，但为了提高代码可读性和团队协作的一致性，推荐遵循一定的顺序规范。以下是一个推荐顺序：
 
-1. `@RequestParam`：用于绑定 URL 查询参数或表单提交数据。
+1. `@RequestParam`：用于绑定`URL`查询参数或表单提交数据。
 2. `@RequestHeader`：用于绑定请求头信息。
-3. `@CookieValue`：用于绑定 Cookie 值。
-4. `@PathVariable`：用于绑定 URI 模板变量。
-5. `@RequestBody`：用于绑定请求体（通常是 JSON 或 XML 数据）。
+3. `@CookieValue`：用于绑定`Cookie`值。
+4. `@PathVariable`：用于绑定`URI`模板变量。
+5. `@RequestBody`：用于绑定请求体（通常是`JSON`或`XML`数据）。
+6. `@RequestPart`：用于绑定请求体中的部分数据（如文件上传）。
+7. `@ModelAttribute`：用于绑定请求参数到`JavaBean`对象。
+8. `@Valid`：用于对参数进行校验。
+9. `@AuthenticationPrincipal`：用于获取当前登录用户信息。
+10. `@SessionAttribute`：用于获取当前会话中的属性。
+11. `@RequestAttribute`：用于获取请求属性。
+12. `@RequestScope`：用于获取当前请求作用域中的属性。
+13. `@ServletRequest`：用于获取`Servlet`请求对象。
+14. `@ServletResponse`：用于获取`Servlet`响应对象。
+15. 其他通用参数（包括`HttpServletRequest`，`HttpServletResponse`，`Principal`等）
 
 ```java
 // 示例
 @PostMapping("/example")
 public ResponseEntity<String> exampleMethod(
+    // 1. 基础参数
     @RequestParam String param,
+    // 2. 请求头
     @RequestHeader("User-Agent") String userAgent,
+    // 3. Cookie
     @CookieValue(value = "JSESSIONID", required = false) String sessionId,
+    // 4. 路径变量
     @PathVariable String id,
-    @RequestBody RequestDTO requestDTO) {
-
+    // 5. 请求体
+    @RequestBody RequestDTO requestDTO,
+    // 6. 文件上传部分
+    @RequestPart("file") MultipartFile file,
+    // 7. 绑定到 JavaBean
+    @ModelAttribute("user") User user,
+    // 8. 参数校验
+    @Valid @RequestBody AnotherDTO anotherDTO,
+    // 9. 认证信息
+    @AuthenticationPrincipal UserDetails userDetails,
+    // 10. Session 属性
+    @SessionAttribute("token") String token,
+    // 11. Request 属性
+    @RequestAttribute("requestAttr") String requestAttr,
+    // 12. Request Scope 属性
+    @RequestScope Map<String, Object> requestScopeMap,
+    // 13. Servlet 请求对象
+    HttpServletRequest request,
+    // 14. Servlet 响应对象
+    HttpServletResponse response,
+    // 15. 其他通用参数
+    Principal principal
+) {
     // 方法体
 }
 ```
