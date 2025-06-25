@@ -60,6 +60,12 @@ app:
     allowed-referer-list:
       - "http://localhost:8080/swagger-ui/index.html"
       - "test"
+    allowed-origin-list:
+      - "http://localhost:8080"
+      - "http://localhost:3000"
+    exclude-paths:
+      - "/api/auth/login"
+      - "/api/auth/captcha"
   captcha:
     expiration: 5 # 验证码过期时间，单位为分钟
 
