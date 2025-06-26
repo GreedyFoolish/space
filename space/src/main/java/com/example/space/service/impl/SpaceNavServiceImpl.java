@@ -1,16 +1,21 @@
 package com.example.space.service.impl;
 
 import com.example.space.convert.SpaceNavConvertor;
+import com.example.space.dto.PageResponse;
 import com.example.space.dto.SpaceNavDTO;
+import com.example.space.dto.SpaceNavQueryDTO;
 import com.example.space.dto.SpaceNavTreeDTO;
 import com.example.space.enums.ResponseCodeEnum;
 import com.example.space.exception.BusinessException;
 import com.example.space.model.SpaceNav;
 import com.example.space.repository.SpaceNavRepository;
 import com.example.space.service.SpaceNavService;
-import com.example.space.vo.SpaceNavVO;
+import com.example.space.specification.SpaceNavSpecs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,21 +75,31 @@ public class SpaceNavServiceImpl implements SpaceNavService {
     }
 
     @Override
-    public List<SpaceNavDTO> getNavsByUserId(Long userId, String navName, List<Boolean> status) {
+    public PageResponse<SpaceNavDTO> getNavsByUserId(Long userId, SpaceNavQueryDTO spaceNavQueryDTO, int page, int size) {
+        List<Boolean> status = spaceNavQueryDTO.getStatus();
         // 将布尔值列表转换为整数列表
         List<Integer> intStatus = status != null
             ? status.stream().map(b -> b ? 0 : 1).toList()
             : null;
-        return spaceNavRepository.getAllNavs(navName, intStatus);
+        if (intStatus != null && intStatus.isEmpty()) {
+            intStatus = null;
+        }
+        spaceNavQueryDTO.setIntStatus(intStatus);
+        // 构建查询条件
+        Specification<SpaceNav> spec = new SpaceNavSpecs(spaceNavQueryDTO);
+        // 执行分页查询
+        Page<SpaceNavDTO> resultPage = spaceNavRepository.getAllNavs(spec, PageRequest.of(page, size));
+        // 转换为 DTO 并封装成 PageResponse 返回
+        return PageResponse.from(resultPage);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String addNavMenu(SpaceNavVO spaceNavVO, Long userId) {
-        if (spaceNavVO == null || spaceNavVO.getNavName().isEmpty()) {
+    public String addNavMenu(Long userId, SpaceNavDTO spaceNavDTO) {
+        if (spaceNavDTO == null || spaceNavDTO.getNavName().isEmpty()) {
             throw new BusinessException(ResponseCodeEnum.CUSTOM_ERROR_1001.getCode(), "导航名称不能为空");
         }
-        SpaceNav spaceNav = SpaceNavConvertor.INSTANCE.convertVoToEntity(spaceNavVO);
+        SpaceNav spaceNav = SpaceNavConvertor.INSTANCE.convertDtoToEntity(spaceNavDTO);
         // 设置创建人和更新人
         spaceNav.setCreateBy(userId);
         spaceNav.setUpdateBy(userId);

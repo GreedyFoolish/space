@@ -49,9 +49,6 @@ public class BaseSpaceNavDTO {
     @Schema(description = "导航排序，数值越小越靠前。默认值为50")
     private int navSort;
 
-    @Schema(description = "状态标志，false-正常，true-删除。默认值为false")
-    private Boolean status;
-
     public BaseSpaceNavDTO() {
 
     }
@@ -59,7 +56,7 @@ public class BaseSpaceNavDTO {
     public BaseSpaceNavDTO(
         Long id, Long parentId, String navType, String navName, String navRouteName,
         Boolean isFrame, String navUrl, String navIcon, Boolean isCache, String navComponent,
-        Boolean isVisible, int navSort, Boolean status
+        Boolean isVisible, int navSort
     ) {
         this.id = id;
         this.parentId = parentId;
@@ -73,7 +70,6 @@ public class BaseSpaceNavDTO {
         this.navComponent = navComponent;
         this.isVisible = isVisible;
         this.navSort = navSort;
-        this.status = status;
     }
 
 }

@@ -1,8 +1,9 @@
 package com.example.space.service;
 
+import com.example.space.dto.PageResponse;
 import com.example.space.dto.SpaceNavDTO;
+import com.example.space.dto.SpaceNavQueryDTO;
 import com.example.space.dto.SpaceNavTreeDTO;
-import com.example.space.vo.SpaceNavVO;
 
 import java.util.List;
 
@@ -17,22 +18,21 @@ public interface SpaceNavService {
     List<SpaceNavTreeDTO> buildNavTree(Long roleId);
 
     /**
-     * 根据用户ID、导航名称和状态筛选导航菜单
+     * 根据用户ID和查询条件获取导航列表
      *
-     * @param userId  用户ID
-     * @param navName 导航名称（可选）
-     * @param status  导航状态（可选）
+     * @param userId           用户ID
+     * @param spaceNavQueryDTO 查询条件
      * @return 符合条件的导航列表
      */
-    List<SpaceNavDTO> getNavsByUserId(Long userId, String navName, List<Boolean> status);
+    PageResponse<SpaceNavDTO> getNavsByUserId(Long userId, SpaceNavQueryDTO spaceNavQueryDTO, int page, int size);
 
     /**
      * 添加导航菜单
      *
-     * @param spaceNavVO 导航菜单信息
-     * @param userId     用户ID
+     * @param userId      用户ID
+     * @param spaceNavDTO 导航信息
      * @return 是否添加成功
      */
-    String addNavMenu(SpaceNavVO spaceNavVO, Long userId);
+    String addNavMenu(Long userId, SpaceNavDTO spaceNavDTO);
 
 }

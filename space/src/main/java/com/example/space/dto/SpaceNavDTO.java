@@ -8,6 +8,9 @@ import lombok.Setter;
 @Setter
 public class SpaceNavDTO extends BaseSpaceNavDTO {
 
+    @Schema(description = "状态标志，false-正常，true-删除。默认值为false")
+    private Boolean status;
+
     @Schema(description = "父级导航名称")
     private String parentNavName;
 
@@ -22,8 +25,9 @@ public class SpaceNavDTO extends BaseSpaceNavDTO {
     ) {
         super(id, parentId, navType, navName, navRouteName,
             isFrame == 1, navUrl, navIcon, isCache == 1, navComponent,
-            isVisible == 1, navSort, status == 0
+            isVisible == 1, navSort
         );
+        this.status = status == 0;
         this.parentNavName = parentNavName;
     }
 

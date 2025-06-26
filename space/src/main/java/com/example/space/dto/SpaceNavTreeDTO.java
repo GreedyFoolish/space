@@ -10,6 +10,9 @@ import java.util.List;
 @Setter
 public class SpaceNavTreeDTO extends BaseSpaceNavDTO {
 
+    @Schema(description = "状态标志，false-正常，true-删除。默认值为false")
+    private Boolean status;
+
     @Schema(description = "子导航信息")
     private List<SpaceNavTreeDTO> children;
 
@@ -24,8 +27,9 @@ public class SpaceNavTreeDTO extends BaseSpaceNavDTO {
     ) {
         super(id, parentId, navType, navName, navRouteName,
             isFrame == 1, navUrl, navIcon, isCache == 1,
-            navComponent, isVisible == 1, navSort, status == 0
+            navComponent, isVisible == 1, navSort
         );
+        this.status = status == 0;
     }
 
 }
