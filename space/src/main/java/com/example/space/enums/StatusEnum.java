@@ -6,50 +6,50 @@ import java.util.Collections;
 import java.util.List;
 
 @Getter
-public enum BooleanEnum {
+public enum StatusEnum {
 
-    TRUE(true, 1),
-    FALSE(false, 0);
+    ENABLED("启用", 0),
+    DISABLED("禁用", 1);
 
-    private final Boolean key;
+    private final String desc;
     private final Integer value;
 
-    BooleanEnum(Boolean key, Integer value) {
-        this.key = key;
+    StatusEnum(String desc, Integer value) {
+        this.desc = desc;
         this.value = value;
     }
 
     /**
-     * 根据 value 获取枚举对象
+     * 根据状态码获取枚举对象
      */
-    public static BooleanEnum fromValue(Integer value) {
+    public static StatusEnum fromValue(Integer value) {
         if (value == null) {
             return null;
         }
-        for (BooleanEnum bool : values()) {
-            if (bool.value.equals(value)) {
-                return bool;
+        for (StatusEnum status : values()) {
+            if (status.value.equals(value)) {
+                return status;
             }
         }
         return null;
     }
 
     /**
-     * 将 Boolean 转为 Integer
+     * 将 Boolean 转换为状态码（true -> ENABLED(0), false -> DISABLED(1)）
      */
     public static Integer toInteger(Boolean bool) {
-        return bool != null && bool ? TRUE.value : FALSE.value;
+        return bool != null && bool ? ENABLED.value : DISABLED.value;
     }
 
     /**
-     * 将 Integer 转为 Boolean
+     * 将状态码转换为 Boolean（0 -> true, 1 -> false）
      */
     public static Boolean toBoolean(Integer value) {
-        return value != null && value.equals(TRUE.value);
+        return value != null && value.equals(ENABLED.value);
     }
 
     /**
-     * 将 List<Boolean> 转换为 List<Integer>
+     * 批量转换 List<Boolean> -> List<Integer>
      */
     public static List<Integer> toIntegers(List<Boolean> booleans) {
         if (booleans == null) {
@@ -57,12 +57,12 @@ public enum BooleanEnum {
         }
 
         return booleans.stream()
-            .map(BooleanEnum::toInteger)
+            .map(StatusEnum::toInteger)
             .toList();
     }
 
     /**
-     * 将 List<Integer> 转换为 List<Boolean>
+     * 批量转换 List<Integer> -> List<Boolean>
      */
     public static List<Boolean> toBooleans(List<Integer> integers) {
         if (integers == null) {
@@ -70,7 +70,7 @@ public enum BooleanEnum {
         }
 
         return integers.stream()
-            .map(BooleanEnum::toBoolean)
+            .map(StatusEnum::toBoolean)
             .toList();
     }
 
