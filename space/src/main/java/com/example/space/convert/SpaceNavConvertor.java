@@ -2,6 +2,7 @@ package com.example.space.convert;
 
 import com.example.space.dto.SpaceNavDTO;
 import com.example.space.enums.BooleanEnum;
+import com.example.space.enums.StatusEnum;
 import com.example.space.model.SpaceNav;
 import com.example.space.vo.SpaceNavVO;
 
@@ -51,7 +52,7 @@ public class SpaceNavConvertor {
         entity.setNavComponent(spaceNavVO.getNavComponent());
         entity.setIsVisible(BooleanEnum.toInteger(spaceNavVO.getIsVisible()));
         entity.setNavSort(spaceNavVO.getNavSort());
-        entity.setStatus(convertBooleanToStatusInt(spaceNavVO.getStatus()));
+        entity.setStatus(StatusEnum.toInteger(spaceNavVO.getStatus()));
 
         return entity;
     }
@@ -98,7 +99,7 @@ public class SpaceNavConvertor {
         entity.setNavComponent(spaceNavDTO.getNavComponent());
         entity.setIsVisible(BooleanEnum.toInteger(spaceNavDTO.getIsVisible()));
         entity.setNavSort(spaceNavDTO.getNavSort());
-        entity.setStatus(convertBooleanToStatusInt(spaceNavDTO.getStatus()));
+        entity.setStatus(StatusEnum.toInteger(spaceNavDTO.getStatus()));
 
         return entity;
     }
@@ -122,7 +123,7 @@ public class SpaceNavConvertor {
         spaceNavVO.setNavComponent(entity.getNavComponent());
         spaceNavVO.setIsVisible(BooleanEnum.toBoolean(entity.getIsVisible()));
         spaceNavVO.setNavSort(entity.getNavSort());
-        spaceNavVO.setStatus(convertIntToStatusIntBoolean(entity.getStatus()));
+        spaceNavVO.setStatus(StatusEnum.toBoolean(entity.getStatus()));
 
         return spaceNavVO;
     }
@@ -145,19 +146,9 @@ public class SpaceNavConvertor {
         dto.setNavComponent(entity.getNavComponent());
         dto.setIsVisible(BooleanEnum.toBoolean(entity.getIsVisible()));
         dto.setNavSort(entity.getNavSort());
-        dto.setStatus(convertIntToStatusIntBoolean(entity.getStatus()));
+        dto.setStatus(StatusEnum.toBoolean(entity.getStatus()));
 
         return dto;
-    }
-
-    // 将布尔值转换为对应的状态码。true -> 0（表示启用） false -> 1（表示停用）
-    private Integer convertBooleanToStatusInt(Boolean bool) {
-        return bool != null && bool ? 0 : 1;
-    }
-
-    // 将状态码转换为对应的布尔值。0 -> true（表示启用） 1 -> false（表示停用）
-    private Boolean convertIntToStatusIntBoolean(Integer value) {
-        return value != null && value.equals(BooleanEnum.FALSE.getValue());
     }
 
 }

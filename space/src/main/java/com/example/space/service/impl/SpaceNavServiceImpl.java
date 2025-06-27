@@ -6,6 +6,7 @@ import com.example.space.dto.SpaceNavDTO;
 import com.example.space.dto.SpaceNavQueryDTO;
 import com.example.space.dto.SpaceNavTreeDTO;
 import com.example.space.enums.ResponseCodeEnum;
+import com.example.space.enums.StatusEnum;
 import com.example.space.exception.BusinessException;
 import com.example.space.model.SpaceNav;
 import com.example.space.repository.SpaceNavRepository;
@@ -76,21 +77,25 @@ public class SpaceNavServiceImpl implements SpaceNavService {
 
     @Override
     public PageResponse<SpaceNavDTO> getNavsByUserId(Long userId, SpaceNavQueryDTO spaceNavQueryDTO, int page, int size) {
-        List<Boolean> status = spaceNavQueryDTO.getStatus();
-        // 将布尔值列表转换为整数列表
-        List<Integer> intStatus = status != null
-            ? status.stream().map(b -> b ? 0 : 1).toList()
-            : null;
-        if (intStatus != null && intStatus.isEmpty()) {
-            intStatus = null;
+        // 参数校验
+        if (page < 0 || size <= 0) {
+            throw new BusinessException(ResponseCodeEnum.CUSTOM_ERROR_1001.getCode(), "分页参数非法");
         }
-        spaceNavQueryDTO.setIntStatus(intStatus);
-        // 构建查询条件
-        Specification<SpaceNav> spec = new SpaceNavSpecs(spaceNavQueryDTO);
-        // 执行分页查询
-        Page<SpaceNavDTO> resultPage = spaceNavRepository.getAllNavs(spec, PageRequest.of(page, size));
-        // 转换为 DTO 并封装成 PageResponse 返回
-        return PageResponse.from(resultPage);
+        logger.info("开始查询导航列表，用户ID: {}, 查询条件: {}", userId, spaceNavQueryDTO);
+        try {
+            // 将状态列表转换为整数列表
+            spaceNavQueryDTO.setIntStatus(StatusEnum.toIntegers(spaceNavQueryDTO.getStatus()));
+            // 构建查询条件
+            Specification<SpaceNav> spec = new SpaceNavSpecs(spaceNavQueryDTO);
+            // 执行分页查询
+            Page<SpaceNavDTO> resultPage = spaceNavRepository.getAllNavs(spec, PageRequest.of(page, size));
+            logger.info("成功获取导航列表，总数: {}", resultPage.getTotalElements());
+            // 转换为 DTO 并封装成 PageResponse 返回
+            return PageResponse.from(resultPage);
+        } catch (Exception e) {
+            logger.error("查询导航列表失败", e);
+            throw new BusinessException(ResponseCodeEnum.CUSTOM_ERROR_1005.getCode(), "查询导航失败");
+        }
     }
 
     @Override
