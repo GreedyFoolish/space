@@ -68,6 +68,12 @@ app:
       - "/api/auth/captcha"
   captcha:
     expiration: 5 # 验证码过期时间，单位为分钟
+  pagination:
+    default-page-index: 0
+    default-page-size: 10
+    min-page-index: 0
+    min-page-size: 10
+    max-page-size: 100
 
 #debug: true
 logging:
