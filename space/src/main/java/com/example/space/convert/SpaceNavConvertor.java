@@ -9,7 +9,7 @@ public class SpaceNavConvertor {
     // 单例
     public static final SpaceNavConvertor INSTANCE = new SpaceNavConvertor();
 
-    // VO -> DTO
+    // VO 转换方法 (VO -> DTO, VO -> Entity)
     public SpaceNavDTO convertVoToDto(SpaceNavVO spaceNavVO) {
         if (spaceNavVO == null) {
             return null;
@@ -33,31 +33,6 @@ public class SpaceNavConvertor {
         return dto;
     }
 
-    // DTO -> Entity
-    public SpaceNav convertDtoToEntity(SpaceNavDTO spaceNavDTO) {
-        if (spaceNavDTO == null) {
-            return null;
-        }
-
-        SpaceNav entity = new SpaceNav();
-        entity.setId(spaceNavDTO.getId());
-        entity.setParentId(spaceNavDTO.getParentId());
-        entity.setNavType(spaceNavDTO.getNavType());
-        entity.setNavName(spaceNavDTO.getNavName());
-        entity.setNavRouteName(spaceNavDTO.getNavRouteName());
-        entity.setIsFrame(BooleanEnum.toInteger(spaceNavDTO.getIsFrame()));
-        entity.setNavUrl(spaceNavDTO.getNavUrl());
-        entity.setNavIcon(spaceNavDTO.getNavIcon());
-        entity.setIsCache(BooleanEnum.toInteger(spaceNavDTO.getIsCache()));
-        entity.setNavComponent(spaceNavDTO.getNavComponent());
-        entity.setIsVisible(BooleanEnum.toInteger(spaceNavDTO.getIsVisible()));
-        entity.setNavSort(spaceNavDTO.getNavSort());
-        entity.setStatus(spaceNavDTO.getStatus() ? 0 : 1);
-
-        return entity;
-    }
-
-    // VO -> Entity
     public SpaceNav convertVoToEntity(SpaceNavVO spaceNavVO) {
         if (spaceNavVO == null) {
             return null;
@@ -76,9 +51,113 @@ public class SpaceNavConvertor {
         entity.setNavComponent(spaceNavVO.getNavComponent());
         entity.setIsVisible(BooleanEnum.toInteger(spaceNavVO.getIsVisible()));
         entity.setNavSort(spaceNavVO.getNavSort());
-        entity.setStatus(spaceNavVO.getStatus() ? 0 : 1);
+        entity.setStatus(convertBooleanToStatusInt(spaceNavVO.getStatus()));
 
         return entity;
+    }
+
+    // DTO 转换方法 (DTO -> VO, DTO -> Entity)
+    public SpaceNavVO convertDTOToVO(SpaceNavDTO spaceNavDTO) {
+        if (spaceNavDTO == null) {
+            return null;
+        }
+
+        SpaceNavVO spaceNavVO = new SpaceNavVO();
+        spaceNavVO.setId(spaceNavDTO.getId());
+        spaceNavVO.setParentId(spaceNavDTO.getParentId());
+        spaceNavVO.setNavType(spaceNavDTO.getNavType());
+        spaceNavVO.setNavName(spaceNavDTO.getNavName());
+        spaceNavVO.setNavRouteName(spaceNavDTO.getNavRouteName());
+        spaceNavVO.setIsFrame(spaceNavDTO.getIsFrame());
+        spaceNavVO.setNavUrl(spaceNavDTO.getNavUrl());
+        spaceNavVO.setNavIcon(spaceNavDTO.getNavIcon());
+        spaceNavVO.setIsCache(spaceNavDTO.getIsCache());
+        spaceNavVO.setNavComponent(spaceNavDTO.getNavComponent());
+        spaceNavVO.setIsVisible(spaceNavDTO.getIsVisible());
+        spaceNavVO.setNavSort(spaceNavDTO.getNavSort());
+        spaceNavVO.setStatus(spaceNavDTO.getStatus());
+
+        return spaceNavVO;
+    }
+
+    public SpaceNav convertDtoToEntity(SpaceNavDTO spaceNavDTO) {
+        if (spaceNavDTO == null) {
+            return null;
+        }
+
+        SpaceNav entity = new SpaceNav();
+        entity.setId(spaceNavDTO.getId());
+        entity.setParentId(spaceNavDTO.getParentId());
+        entity.setNavType(spaceNavDTO.getNavType());
+        entity.setNavName(spaceNavDTO.getNavName());
+        entity.setNavRouteName(spaceNavDTO.getNavRouteName());
+        entity.setIsFrame(BooleanEnum.toInteger(spaceNavDTO.getIsFrame()));
+        entity.setNavUrl(spaceNavDTO.getNavUrl());
+        entity.setNavIcon(spaceNavDTO.getNavIcon());
+        entity.setIsCache(BooleanEnum.toInteger(spaceNavDTO.getIsCache()));
+        entity.setNavComponent(spaceNavDTO.getNavComponent());
+        entity.setIsVisible(BooleanEnum.toInteger(spaceNavDTO.getIsVisible()));
+        entity.setNavSort(spaceNavDTO.getNavSort());
+        entity.setStatus(convertBooleanToStatusInt(spaceNavDTO.getStatus()));
+
+        return entity;
+    }
+
+    // Entity 转换方法 (Entity -> VO, Entity -> DTO)
+    public SpaceNavVO convertEntityToVO(SpaceNav entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        SpaceNavVO spaceNavVO = new SpaceNavVO();
+        spaceNavVO.setId(entity.getId());
+        spaceNavVO.setParentId(entity.getParentId());
+        spaceNavVO.setNavType(entity.getNavType());
+        spaceNavVO.setNavName(entity.getNavName());
+        spaceNavVO.setNavRouteName(entity.getNavRouteName());
+        spaceNavVO.setIsFrame(BooleanEnum.toBoolean(entity.getIsFrame()));
+        spaceNavVO.setNavUrl(entity.getNavUrl());
+        spaceNavVO.setNavIcon(entity.getNavIcon());
+        spaceNavVO.setIsCache(BooleanEnum.toBoolean(entity.getIsCache()));
+        spaceNavVO.setNavComponent(entity.getNavComponent());
+        spaceNavVO.setIsVisible(BooleanEnum.toBoolean(entity.getIsVisible()));
+        spaceNavVO.setNavSort(entity.getNavSort());
+        spaceNavVO.setStatus(convertIntToStatusIntBoolean(entity.getStatus()));
+
+        return spaceNavVO;
+    }
+
+    public SpaceNavDTO convertEntityToDTO(SpaceNav entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        SpaceNavDTO dto = new SpaceNavDTO();
+        dto.setId(entity.getId());
+        dto.setParentId(entity.getParentId());
+        dto.setNavType(entity.getNavType());
+        dto.setNavName(entity.getNavName());
+        dto.setNavRouteName(entity.getNavRouteName());
+        dto.setIsFrame(BooleanEnum.toBoolean(entity.getIsFrame()));
+        dto.setNavUrl(entity.getNavUrl());
+        dto.setNavIcon(entity.getNavIcon());
+        dto.setIsCache(BooleanEnum.toBoolean(entity.getIsCache()));
+        dto.setNavComponent(entity.getNavComponent());
+        dto.setIsVisible(BooleanEnum.toBoolean(entity.getIsVisible()));
+        dto.setNavSort(entity.getNavSort());
+        dto.setStatus(convertIntToStatusIntBoolean(entity.getStatus()));
+
+        return dto;
+    }
+
+    // 将布尔值转换为对应的状态码。true -> 0（表示启用） false -> 1（表示停用）
+    private Integer convertBooleanToStatusInt(Boolean bool) {
+        return bool != null && bool ? 0 : 1;
+    }
+
+    // 将状态码转换为对应的布尔值。0 -> true（表示启用） 1 -> false（表示停用）
+    private Boolean convertIntToStatusIntBoolean(Integer value) {
+        return value != null && value.equals(BooleanEnum.FALSE.getValue());
     }
 
 }
