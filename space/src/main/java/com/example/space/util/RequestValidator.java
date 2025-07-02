@@ -34,6 +34,16 @@ public class RequestValidator {
     }
 
     /**
+     * 确保 pageIndex 大于等于默认的最小页码。
+     *
+     * @param pageIndex 请求的页码，可为 null，此时使用默认值
+     * @return 合法化后的页码
+     */
+    public int validatePageIndex(Integer pageIndex) {
+        return this.validatePageIndex(pageIndex, null);
+    }
+
+    /**
      * 确保 pageSize 在指定或默认的最小和最大页面大小之间。
      *
      * @param pageSize    请求的页面大小，可为 null，此时使用默认值
@@ -49,6 +59,16 @@ public class RequestValidator {
             throw new IllegalArgumentException("页面大小范围无效：min=" + effectiveMinPageSize + ", max=" + effectiveMaxPageSize);
         }
         return Math.min(Math.max(effectiveMinPageSize, effectivePageSize), effectiveMaxPageSize);
+    }
+
+    /**
+     * 确保 pageSize 在默认的最小和最大页面大小之间。
+     *
+     * @param pageSize 请求的页面大小，可为 null，此时使用默认值
+     * @return 合法化后的页面大小
+     */
+    public int validatePageSize(Integer pageSize) {
+        return this.validatePageSize(pageSize, null, null);
     }
 
     /**

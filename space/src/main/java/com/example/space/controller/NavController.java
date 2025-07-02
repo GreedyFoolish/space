@@ -46,8 +46,8 @@ public class NavController {
         @RequestParam(required = false) Integer pageSize,
         @RequestAttribute("userId") Long userId
     ) {
-        pageIndex = requestValidator.validatePageIndex(pageIndex, null);
-        pageSize = requestValidator.validatePageSize(pageSize, null, null);
+        pageIndex = requestValidator.validatePageIndex(pageIndex);
+        pageSize = requestValidator.validatePageSize(pageSize);
         String navName = spaceNavQueryDTO.getNavName();
         List<Boolean> status = spaceNavQueryDTO.getStatus();
         // 记录搜索导航列表的参数
