@@ -51,6 +51,52 @@ export function isPathMatch(pattern, path) {
 }
 
 /**
+ * 验证给定的值是否为有效的数字
+ * @param {any} value 待验证的值
+ * @param {string} key 参数名称，用于错误消息中
+ * @param {Object} options 可选配置对象
+ * @param {boolean} [options.throwError=true] 是否抛出错误如果验证失败
+ * @returns {boolean} 如果值是一个有效的数字，则返回true；否则返回false
+ */
+export function validateNumber(value, key, { throwError = true } = {}) {
+    const paramName = typeof key === "string" ? key : "未知参数"
+
+    if (value === null) {
+        const errorMsg = `参数 ${paramName} 不能为 null`
+        if (throwError) {
+            throw new TypeError(errorMsg)
+        }
+        return false
+    }
+
+    if (typeof value !== "number") {
+        const errorMsg = `参数 ${paramName} 必须为数字类型`
+        if (throwError) {
+            throw new TypeError(errorMsg)
+        }
+        return false
+    }
+
+    if (isNaN(value)) {
+        const errorMsg = `参数 ${paramName} 不能为 NaN`
+        if (throwError) {
+            throw new TypeError(errorMsg)
+        }
+        return false
+    }
+
+    if (!isFinite(value)) {
+        const errorMsg = `参数 ${paramName} 必须为有限数值`
+        if (throwError) {
+            throw new TypeError(errorMsg)
+        }
+        return false
+    }
+
+    return true
+}
+
+/**
  * 判断value字符串是否为空
  * @param {string} value
  * @returns {Boolean}
