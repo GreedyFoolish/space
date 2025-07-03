@@ -61,6 +61,14 @@
             </el-table-column>
         </el-table>
 
+        <Pagination
+            :total="total"
+            v-model:currentPage="getPageIndex"
+            v-model:pageSize="queryForm.pageSize"
+            @pagination="getList"
+        >
+        </Pagination>
+
         <el-dialog v-model="dialogVisible" :title="title" width="640" append-to-body>
             <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
                 <el-row>
@@ -243,9 +251,10 @@
 
 <script setup>
 import { Delete, Edit, Plus, Sort } from "@element-plus/icons-vue"
-import { ref, reactive, onMounted } from "vue"
-import { getMenuList } from "@/api/system/menu.js"
+import { ref, reactive, computed, onMounted } from "vue"
+import { addMenu, getMenuList } from "@/api/system/menu.js"
 import SelectAll from "@/components/SelectAll/index.vue"
+import Pagination from "@/components/Pagination/index.vue"
 import { getIcon } from "@/utils/iconUtils.js"
 import { buildTreeData, findTreeNodeByKey } from "@/utils/treeUtils.js"
 
@@ -311,12 +320,24 @@ const tableData = ref([])
 const treeData = ref([])
 const title = ref("新增")
 const dialogVisible = ref(false)
+const total = ref(0)
 
 const queryForm = reactive({
+    pageIndex: 0,
+    pageSize: 10,
     navName: null,
     status: [true]
 })
 const editForm = ref({})
+
+const getPageIndex = computed({
+    get() {
+        return queryForm.pageIndex + 1
+    },
+    set(value) {
+        queryForm.pageIndex = value - 1
+    }
+})
 
 const isMenu = (form = editForm.value) => {
     return form?.navType === "menu"
@@ -386,6 +407,23 @@ const editRules = reactive({
 
 const submitForm = () => {
     console.log("submitForm", editForm.value)
+    if (title.value === "新增") {
+        addMenu(editForm.value).then((res) => {
+            if (res.code === 200) {
+                dialogVisible.value = false
+                getList()
+                ElMessage({
+                    message: "新增成功",
+                    type: "success"
+                })
+            } else {
+                ElMessage({
+                    message: "新增失败",
+                    type: "warning"
+                })
+            }
+        })
+    }
 }
 
 const cancel = () => {
@@ -412,13 +450,14 @@ const getList = () => {
     queryFormRef.value.validate((valid) => {
         if (valid) {
             getMenuList(queryForm).then((res) => {
-                res.data.map((item) => {
+                res.data.content.map((item) => {
                     if (item.parentNavName === null) {
                         item.parentNavName = "主目录"
                     }
                     return item
                 })
-                tableData.value = res.data
+                tableData.value = res.data.content
+                total.value = res.data.totalElements
             })
         }
     })
@@ -431,7 +470,7 @@ const getTreeList = () => {
             navName: "主目录",
             navSort: 0,
             navType: "root",
-            children: buildTreeData(res.data)
+            children: buildTreeData(res.data.content)
         }]
     })
 }

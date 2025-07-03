@@ -95,5 +95,8 @@ const handleSizeChange = (value) => {
 </script>
 
 <style scoped>
-
+.pagination-container {
+    display: flex;
+    justify-content: end;
+}
 </style>
