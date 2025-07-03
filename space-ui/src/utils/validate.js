@@ -1,12 +1,52 @@
+// 缓存已生成的正则表达式，避免重复计算
+const regexCache = new Map()
+
 /**
- * 路径匹配器
- * @param {string} pattern
- * @param {string} path
- * @returns {Boolean}
+ * 从缓存中获取已存在的正则表达式
+ * @param {string} pattern 正则模式
+ * @returns {RegExp|undefined} 正则表达式
+ */
+function getCachedRegex(pattern) {
+    return regexCache.get(pattern)
+}
+
+/**
+ * 对字符串中的正则特殊字符进行转义，除了 * 和 ** 外的所有字符都视为字面量
+ * @param {string} str 需要转义的字符串
+ * @returns {string} 转义后的字符串
+ */
+function escapeRegExp(str) {
+    // 使用 replace 替换所有非 * 字符中的正则元字符
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
+/**
+ * 判断路径是否匹配给定的模式（支持 * 和 ** 通配符）
+ * @param {string} pattern 匹配模式，可能包含 `*` 和 `**` 作为通配符
+ * @param {string} path 实际路径，如果与模式匹配将返回 true
+ * @returns {boolean} 是否匹配
  */
 export function isPathMatch(pattern, path) {
-    const regexPattern = pattern.replace(/\//g, "\\/").replace(/\*\*/g, ".*").replace(/\*/g, "[^\\/]*")
+    // 输入校验
+    if (typeof pattern !== "string" || typeof path !== "string") {
+        return false
+    }
+    // 如果缓存中已有该 pattern 对应的正则表达式，则直接使用
+    const cachedRegex = getCachedRegex(pattern)
+    if (cachedRegex) {
+        return cachedRegex.test(path)
+    }
+    // 构建正则表达式模式字符串
+    const escapedPattern = escapeRegExp(pattern)
+    const regexPattern = escapedPattern
+        .replace(/\\\*/g, "*")          // 恢复 * 以便后续替换
+        .replace(/(\*\*)/g, ".*")       // 替换 ** 为 .* （递归匹配任意路径段）
+        .replace(/\*/g, "[^\\/]*")      // 替换 * 为 [^\\/]*
+        .replace(/\//g, "\\/")         // 替换 / 为 \/
+    // 构建正则表达式并缓存
     const regex = new RegExp(`^${regexPattern}$`)
+    regexCache.set(pattern, regex)
+    // 测试路径是否与模式匹配
     return regex.test(path)
 }
 
