@@ -14,9 +14,10 @@ const unitRegex = new RegExp(`^([-+]?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?)(${unitPatte
  * 获取指定 CSS 变量的值，并尝试解析出数值和单位
  * 支持常见单位如 px, rem, em, %, vh, vw 等
  * @param {string} variableName CSS变量名（如 "--top-navbar-menu-item-width"）
+ * @param contextElement 获取CSS变量的元素，默认为 document.documentElement
  * @returns {{unit: (string), value: (null | number | string | boolean)}} 包含数值和单位的对象
  */
-export const getCssVariableValue = (variableName) => {
+export const getCssVariableValue = (variableName, contextElement = document.documentElement) => {
     if (typeof variableName !== "string" || !variableName.startsWith("--")) {
         console.warn(`CSS变量名无效：${variableName}`)
         return { value: null, unit: "" }
@@ -25,7 +26,7 @@ export const getCssVariableValue = (variableName) => {
     // 获取CSS变量的值
     let rawValue
     try {
-        rawValue = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim()
+        rawValue = getComputedStyle(contextElement).getPropertyValue(variableName).trim()
     } catch (e) {
         console.error("获取CSS变量失败", e)
         return { value: null, unit: "" }
