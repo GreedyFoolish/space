@@ -137,7 +137,7 @@ export function isArray(arg) {
 export function validateArray(value, key, { minLength = 0, throwError = true } = {}) {
     const paramName = getParamName(key)
 
-    if (isArray(value)) {
+    if (!isArray(value)) {
         const errorMsg = `参数${paramName} 必须为数组类型`;
         handleError(errorMsg, value, throwError)
     }
