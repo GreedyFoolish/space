@@ -1,5 +1,35 @@
+const DEFAULT_KEY_NAME = "未知参数";
 // 缓存已生成的正则表达式，避免重复计算
 const regexCache = new Map()
+
+/**
+ * 获取参数名称，若为空则返回 DEFAULT_KEY_NAME
+ * @param {string} key 参数名
+ * @param {string} keyName 默认键名称，默认值为 DEFAULT_KEY_NAME
+ * @returns {string} 规范化后的键名称或默认键名称
+ */
+function getParamName(key, keyName = DEFAULT_KEY_NAME) {
+    if (typeof key === "string") {
+        return key.trim() || keyName;
+    }
+    return keyName;
+}
+
+/**
+ * 统一处理验证失败的情况
+ * @param {string} message 错误信息
+ * @param {any} value 出错的原始值
+ * @param {boolean} throwError 是否抛出错误
+ * @returns {boolean} 总是返回 false 表示验证失败
+ */
+function handleError(message, value, throwError = false) {
+    if (throwError) {
+        throw new TypeError(message);
+    } else {
+        console.warn(message, value);
+        return false;
+    }
+}
 
 /**
  * 从缓存中获取已存在的正则表达式
@@ -59,41 +89,65 @@ export function isPathMatch(pattern, path) {
  * @returns {boolean} 如果值是一个有效的数字，则返回true；否则返回false
  */
 export function validateNumber(value, key, { throwError = true } = {}) {
-    const paramName = typeof key === "string" ? key : "未知参数"
+    const paramName = getParamName(key)
 
     if (value === null) {
         const errorMsg = `参数 ${paramName} 不能为 null`
-        if (throwError) {
-            throw new TypeError(errorMsg)
-        }
-        return false
+        handleError(errorMsg, value, throwError)
     }
 
     if (typeof value !== "number") {
         const errorMsg = `参数 ${paramName} 必须为数字类型`
-        if (throwError) {
-            throw new TypeError(errorMsg)
-        }
-        return false
+        handleError(errorMsg, value, throwError)
     }
 
     if (isNaN(value)) {
         const errorMsg = `参数 ${paramName} 不能为 NaN`
-        if (throwError) {
-            throw new TypeError(errorMsg)
-        }
-        return false
+        handleError(errorMsg, value, throwError)
     }
 
     if (!isFinite(value)) {
         const errorMsg = `参数 ${paramName} 必须为有限数值`
-        if (throwError) {
-            throw new TypeError(errorMsg)
-        }
-        return false
+        handleError(errorMsg, value, throwError)
     }
 
     return true
+}
+
+/**
+ * 判断是否为数组
+ * @param {any} arg 待判断的值
+ * @returns {boolean} 是否为数组
+ */
+export function isArray(arg) {
+    return Array.isArray
+        ? Array.isArray(arg)
+        : Object.prototype.toString.call(arg) === "[object Array]";
+}
+
+/**
+ * 验证给定的值是否为符合长度要求的数组
+ * @param {any} value 待验证的值
+ * @param {string} key 参数名称，用于错误消息中
+ * @param {Object} options 可选配置对象
+ * @param {number} [options.minLength=0] 最小长度要求
+ * @param {boolean} [options.throwError=true] 是否抛出错误如果验证失败
+ * @returns {boolean} 如果值是满足条件的数组，则返回 true；否则返回 false
+ */
+export function validateArray(value, key, { minLength = 0, throwError = true } = {}) {
+    const paramName = getParamName(key)
+
+    if (isArray(value)) {
+        const errorMsg = `参数${paramName} 必须为数组类型`;
+        handleError(errorMsg, value, throwError)
+    }
+
+    if (value.length < minLength) {
+        const errorMsg = `参数 ${paramName} 必须为长度 >= ${minLength} 的数组`;
+        return handleError(errorMsg, value, throwError);
+    }
+
+    return true;
 }
 
 /**
@@ -181,16 +235,4 @@ export function validEmail(email) {
  */
 export function isString(str) {
     return typeof str === "string" || str instanceof String
-}
-
-/**
- * 判断是否为数组
- * @param {Array} arg
- * @returns {Boolean}
- */
-export function isArray(arg) {
-    if (typeof Array.isArray === "undefined") {
-        return Object.prototype.toString.call(arg) === "[object Array]"
-    }
-    return Array.isArray(arg)
 }
