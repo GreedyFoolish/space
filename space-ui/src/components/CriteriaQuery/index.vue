@@ -14,6 +14,10 @@
             @add-child-criteria="handleAddChildCriteria"
             @update-sibling-count="(idPath, change) => handleUpdateSiblingCount(idPath, change)"
         >
+            <template #criteria-content="{ criteriaItem }">
+                <slot name="criteria-content" :criteriaItem="criteriaItem">
+                </slot>
+            </template>
         </CriteriaItem>
     </div>
 </template>
@@ -22,7 +26,7 @@
 import { defineEmits, ref, onBeforeMount } from "vue"
 import CriteriaItem from "@/components/CriteriaQuery/CriteriaItem.vue"
 import { generateUUID } from "@/utils/uuidUtils.js"
-import { validateArray, validateNumber } from "@/utils/validate.js";
+import { validateArray, validateNumber } from "@/utils/validate.js"
 
 const props = defineProps({
     // 每页显示个数选择器的选项设置
@@ -32,7 +36,7 @@ const props = defineProps({
             {
                 id: "",
                 idPath: [],
-                type: "",
+                type: "text",
                 operator: "",
                 value: "",
                 logic: "and",
@@ -91,16 +95,16 @@ const findNodeByPath = (path, root = criteriaListWithId.value) => {
 
 const handleToggleLogic = (idPath, logic) => {
     // 使用 findNodeByPath 找到目标节点
-    const { node } = findNodeByPath(idPath);
+    const { node } = findNodeByPath(idPath)
     // 如果找不到目标节点，则进行警告
     if (!node) {
-        console.warn("未找到目标节点", idPath);
-        return;
+        console.warn("未找到目标节点", idPath)
+        return
     }
     // 更新逻辑操作符
-    node.logic = logic;
+    node.logic = logic
     // 触发 Vue 响应式更新
-    criteriaListWithId.value = [...criteriaListWithId.value];
+    criteriaListWithId.value = [...criteriaListWithId.value]
 
     emits("update:criteriaList", criteriaListWithId.value)
     emits("listDataChange", criteriaListWithId.value)
@@ -111,7 +115,7 @@ const handleAddChildCriteria = (idPath = []) => {
     const newChild = {
         id: itemId,
         idPath: [...idPath, itemId],
-        type: "",
+        type: "text",
         operator: "",
         value: "",
         logic: "and",
@@ -162,15 +166,15 @@ const handleUpdateSiblingCount = (idPath = [], change) => {
     // 遍历 idPath 的每个节点并更新 childCount
     for (let i = 0; i < idPath.length; i++) {
         // 构造当前层级路径
-        const currentPath = idPath.slice(0, i + 1);
+        const currentPath = idPath.slice(0, i + 1)
         // 找到对应节点
-        const { node } = findNodeByPath(currentPath);
+        const { node } = findNodeByPath(currentPath)
         if (!node) {
-            console.warn("未找到目标节点：", currentPath);
-            continue;
+            console.warn("未找到目标节点：", currentPath)
+            continue
         }
         // 更新 childCount
-        node.childCount = node.childCount + change;
+        node.childCount = node.childCount + change
     }
     // 触发 Vue 响应式更新
     criteriaListWithId.value = [...criteriaListWithId.value]

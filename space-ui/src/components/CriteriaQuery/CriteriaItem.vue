@@ -14,18 +14,62 @@
         </div>
         <!-- 条件项内容 -->
         <div class="criteria-content">
-            <el-select v-model="criteriaItem.type" placeholder="请选择类型">
-                <el-option label="元数据类型" value="metadata"></el-option>
-                <el-option label="个人库上传" value="personal"></el-option>
-            </el-select>
-            <el-select v-model="criteriaItem.operator" placeholder="请选择操作符">
-                <el-option label="包含" value="diagnose"></el-option>
-                <el-option label="不包含" value="include"></el-option>
-            </el-select>
-            <el-input v-model="criteriaItem.value" placeholder="请输入值"></el-input>
-            <el-button @click="addChildCriteria(criteriaItem?.idPath)">子</el-button>
-            <el-button @click="removeCriteria(criteriaItem?.idPath, -1, true)">删除</el-button>
-            <el-button @click="addCriteria(criteriaItem?.idPath, true)">加</el-button>
+            <!-- 默认内容插槽 -->
+            <div class="criteria-slot-container">
+                <slot name="criteria-content" :criteriaItem="criteriaItem">
+                    <el-select v-model="criteriaItem.type" placeholder="请选择类型">
+                        <el-option
+                            v-for="item in typeMap"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        >
+                        </el-option>
+                    </el-select>
+                    <el-select v-model="criteriaItem.operator" placeholder="请选择操作">
+                        <el-option
+                            v-for="item in getOperators(criteriaItem.type)"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        >
+                        </el-option>
+                    </el-select>
+                    <component
+                        :is="getComponent(criteriaItem.type)"
+                        v-model="criteriaItem.value"
+                        v-bind="getComponentProps(criteriaItem.type)"
+                    >
+                    </component>
+                </slot>
+            </div>
+            <!-- 按钮插槽 -->
+            <div class="criteria-button-container">
+                <el-tooltip content="添加当前条件项兄弟条件项" placement="top">
+                    <component
+                        class="criteria-icon"
+                        :is="getIcon('Plus')"
+                        @click="addCriteria(criteriaItem?.idPath, true)"
+                    >
+                    </component>
+                </el-tooltip>
+                <el-tooltip content="删除当前条件项及其子条件项" placement="top">
+                    <component
+                        class="criteria-icon"
+                        :is="getIcon('Delete')"
+                        @click="removeCriteria(criteriaItem?.idPath, -1, true)"
+                    >
+                    </component>
+                </el-tooltip>
+                <el-tooltip content="添加当前条件项子条件项" placement="top">
+                    <component
+                        class="criteria-icon"
+                        :is="getIcon('DocumentAdd')"
+                        @click="addChildCriteria(criteriaItem?.idPath)"
+                    >
+                    </component>
+                </el-tooltip>
+            </div>
         </div>
         <!-- 子条件项 -->
         <CriteriaItem
@@ -42,6 +86,9 @@
             @remove-criteria="(idPath, deleteCount) => removeCriteria(idPath, deleteCount)"
             @add-child-criteria="(idPath) => addChildCriteria(idPath)"
         >
+            <template #criteria-content="{ criteriaItem }">
+                <slot name="criteria-content" :criteriaItem="criteriaItem" />
+            </template>
         </CriteriaItem>
     </div>
 </template>
@@ -49,7 +96,14 @@
 <script setup>
 import { defineEmits, ref, onMounted } from "vue"
 import { getCssVariableValue } from "@/utils/domUtils.js"
-import { validateArray, validateNumber } from "@/utils/validate.js";
+import { validateArray, validateNumber } from "@/utils/validate.js"
+import { getIcon } from "@/utils/iconUtils.js"
+import TextInput from "@/components/CriteriaQuery/components/TextInput.vue"
+import DateInput from "@/components/CriteriaQuery/components/DateInput.vue"
+import DateTimeInput from "@/components/CriteriaQuery/components/DateTimeInput.vue"
+import NumberInput from "@/components/CriteriaQuery/components/NumberInput.vue"
+import FixedOptionsInput from "@/components/CriteriaQuery/components/FixedOptionsInput.vue"
+import BooleanInput from "@/components/CriteriaQuery/components/BooleanInput.vue"
 
 const props = defineProps({
     // 当前条件项
@@ -113,6 +167,83 @@ const logicMap = {
         toggleTo: "and"
     }
 }
+// 类型映射对象
+const typeMap = [
+    {
+        label: "文本",
+        value: "text"
+    },
+    {
+        label: "日期",
+        value: "date"
+    },
+    {
+        label: "日期时间",
+        value: "datetime"
+    },
+    {
+        label: "数值",
+        value: "number"
+    },
+    {
+        label: "固定选项",
+        value: "fixedOptions"
+    },
+    {
+        label: "是非判断",
+        value: "boolean"
+    }
+]
+// 操作符映射对象
+const operatorMap = {
+    text: [
+        { label: "包含", value: "contains" },
+        { label: "不包含", value: "notContains" },
+        { label: "等于", value: "equals" },
+        { label: "不等于", value: "notEquals" }
+    ],
+    date: [
+        { label: "等于", value: "equals" },
+        { label: "不等于", value: "notEquals" },
+        { label: "大于", value: "greaterThan" },
+        { label: "小于", value: "lessThan" },
+        { label: "大于等于", value: "greaterThanOrEquals" },
+        { label: "小于等于", value: "lessThanOrEquals" }
+    ],
+    datetime: [
+        { label: "等于", value: "equals" },
+        { label: "不等于", value: "notEquals" },
+        { label: "大于", value: "greaterThan" },
+        { label: "小于", value: "lessThan" },
+        { label: "大于等于", value: "greaterThanOrEquals" },
+        { label: "小于等于", value: "lessThanOrEquals" }
+    ],
+    number: [
+        { label: "等于", value: "equals" },
+        { label: "不等于", value: "notEquals" },
+        { label: "大于", value: "greaterThan" },
+        { label: "小于", value: "lessThan" },
+        { label: "大于等于", value: "greaterThanOrEquals" },
+        { label: "小于等于", value: "lessThanOrEquals" }
+    ],
+    fixedOptions: [
+        { label: "等于", value: "equals" },
+        { label: "不等于", value: "notEquals" }
+    ],
+    boolean: [
+        { label: "等于", value: "equals" },
+        { label: "不等于", value: "notEquals" }
+    ]
+}
+// 组件映射对象
+const componentMap = {
+    text: TextInput,
+    date: DateInput,
+    datetime: DateTimeInput,
+    number: NumberInput,
+    fixedOptions: FixedOptionsInput,
+    boolean: BooleanInput
+}
 
 // ref 对象，用于响应式地处理 DOM 元素或组件实例
 const criteriaItemRef = ref(null)
@@ -122,6 +253,11 @@ const criteriaItemGap = ref(DEFAULT_CRITERIA_STYLE.itemGap)
 const criteriaConnectorWidth = ref(DEFAULT_CRITERIA_STYLE.connectorWidth)
 const criteriaConnectorHeight = ref(DEFAULT_CRITERIA_STYLE.connectorHeight)
 const criteriaLogicWidth = ref(DEFAULT_CRITERIA_STYLE.logicWidth)
+// 固定选项数据
+const fixedOptions = ref([
+    { label: "启用", value: "enabled" },
+    { label: "停用", value: "disabled" }
+])
 
 const getParentIdPath = (idPath) => {
     return idPath.length > 0 ? idPath.slice(0, -1) : []
@@ -136,6 +272,23 @@ const getPrevSiblingCount = (list = props.criteriaItem?.children, index = 0) => 
         return list?.[index - 1]?.childCount ?? 0
     }
     return 0
+}
+
+const getOperators = (type = props.criteriaItem?.type) => {
+    return operatorMap[type] || []
+}
+
+const getComponent = (type = props.criteriaItem?.type) => {
+    return componentMap[type] || null
+}
+
+const getComponentProps = (type = props.criteriaItem?.type) => {
+    if (type === "fixedOptions") {
+        return {
+            options: fixedOptions.value
+        }
+    }
+    return {}
 }
 
 const getItemPosition = (index = props.index) => {
@@ -296,6 +449,14 @@ onMounted(() => {
     --criteria-cell-padding: 12px;
     /* 条件项内容区域背景色 */
     --criteria-cell-background-color: #F3F4F6;
+    /* 条件项的选择框宽度 */
+    --criteria-select-width: 120px;
+    /* 条件项的选择框间隔 */
+    --criteria-select-gap: 10px;
+    /* 条件项的图标宽度 */
+    --criteria-icon-width: 16px;
+    /* 条件项的图标间隔 */
+    --criteria-icon-gap: 10px;
     /* 条件项之间的垂直间距（用于排版布局） */
     --criteria-item-gap: 10px;
     /* 连接线的标准宽度（父子/兄弟关系共用） */
@@ -392,7 +553,7 @@ onMounted(() => {
         border-radius: var(--criteria-logic-border-radius);
         cursor: pointer;
         user-select: none;
-        z-index: 9999;
+        z-index: 1;
     }
 
     .criteria-content {
@@ -400,11 +561,47 @@ onMounted(() => {
         margin-bottom: var(--criteria-item-gap);
         padding: var(--criteria-cell-padding);
         display: flex;
+        justify-content: space-between;
         align-items: center;
         position: relative;
         background-color: var(--criteria-cell-background-color);
         border-radius: var(--criteria-connector-border-radius);
         box-sizing: border-box;
+
+        .criteria-slot-container {
+            display: flex;
+            justify-content: start;
+            align-items: center;
+        }
+
+        .criteria-button-container {
+            padding: 0 var(--criteria-icon-gap);
+            display: flex;
+            align-items: center;
+
+            .criteria-icon {
+                width: var(--criteria-icon-width);
+                height: var(--criteria-icon-width);
+                margin-right: var(--criteria-icon-gap);
+
+                &:last-child {
+                    margin-right: 0;
+                }
+            }
+        }
     }
+}
+
+:deep(.criteria-slot-container .el-select) {
+    width: var(--criteria-select-width);
+    margin-right: var(--criteria-select-gap);
+
+    &:last-child {
+        margin-right: 0;
+    }
+}
+
+:deep(.criteria-slot-container .el-select__wrapper) {
+    width: var(--criteria-select-width);
 }
 </style>
