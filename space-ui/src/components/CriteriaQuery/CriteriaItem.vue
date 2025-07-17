@@ -17,7 +17,11 @@
             <!-- 默认内容插槽 -->
             <div class="criteria-slot-container">
                 <slot name="criteria-content" :criteriaItem="criteriaItem">
-                    <el-select v-model="criteriaItem.type" placeholder="请选择类型">
+                    <el-select
+                        v-model="criteriaItem.type"
+                        placeholder="请选择类型"
+                        @change="(type) => typeChange(criteriaItem?.idPath, type)"
+                    >
                         <el-option
                             v-for="item in typeMap"
                             :key="item.value"
@@ -26,7 +30,11 @@
                         >
                         </el-option>
                     </el-select>
-                    <el-select v-model="criteriaItem.operator" placeholder="请选择操作">
+                    <el-select
+                        v-model="criteriaItem.operator"
+                        placeholder="请选择操作"
+                        @change="(operator) => operatorChange(criteriaItem?.idPath, operator)"
+                    >
                         <el-option
                             v-for="item in getOperators(criteriaItem.type)"
                             :key="item.value"
@@ -82,6 +90,8 @@
             :index="childIndex"
             :prevSiblingCount="getPrevSiblingCount(criteriaItem?.children, childIndex)"
             @toggle-logic="(idPath, logic) => toggleLogic(idPath, logic)"
+            @type-change="(idPath, type) => typeChange(idPath, type)"
+            @operator-change="(idPath, operator) => operatorChange(idPath, operator)"
             @add-criteria="(idPath) => addCriteria(idPath)"
             @remove-criteria="(idPath, deleteCount) => removeCriteria(idPath, deleteCount)"
             @add-child-criteria="(idPath) => addChildCriteria(idPath)"
@@ -147,7 +157,22 @@ const props = defineProps({
     }
 })
 
-const emits = defineEmits(["toggle-logic", "add-criteria", "remove-criteria", "add-child-criteria", "update-sibling-count"])
+const emits = defineEmits([
+    // 切换逻辑关系
+    "toggle-logic",
+    // 类型变更事件
+    "type-change",
+    // 操作符变更事件
+    "operator-change",
+    // 添加兄弟条件项
+    "add-criteria",
+    // 移除当前条件项
+    "remove-criteria",
+    // 添加子条件项
+    "add-child-criteria",
+    // 更新兄弟节点数量
+    "update-sibling-count"
+])
 
 // 默认条件项样式配置对象
 const DEFAULT_CRITERIA_STYLE = {
@@ -375,6 +400,14 @@ const toggleLogic = (idPath = props.criteriaItem?.idPath ?? [], logic = props.cr
         logic = logicMap[logic]?.toggleTo ?? "and"
     }
     emits("toggle-logic", idPath, logic)
+}
+
+const typeChange = (idPath = props.criteriaItem?.idPath ?? [], type = props.criteriaItem?.type ?? "text") => {
+    emits("type-change", idPath, type)
+}
+
+const operatorChange = (idPath = props.criteriaItem?.idPath ?? [], operator = props.criteriaItem?.operator) => {
+    emits("operator-change", idPath, operator)
 }
 
 const addCriteria = (idPath = props.criteriaItem?.idPath ?? [], isTriggerItem = false) => {

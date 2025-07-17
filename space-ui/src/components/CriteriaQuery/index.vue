@@ -9,6 +9,8 @@
             :index="index"
             :prevSiblingCount="getPrevSiblingCount(criteriaListWithId, index)"
             @toggle-logic="handleToggleLogic"
+            @type-change="(idPath, type) => handleTypeChange(idPath, type)"
+            @operator-change="(idPath, operator) => handleOperatorChange(idPath, operator)"
             @add-criteria="handleAddChildCriteria"
             @remove-criteria="handleRemoveCriteria"
             @add-child-criteria="handleAddChildCriteria"
@@ -103,6 +105,41 @@ const handleToggleLogic = (idPath, logic) => {
     }
     // 更新逻辑操作符
     node.logic = logic
+    // 触发 Vue 响应式更新
+    criteriaListWithId.value = [...criteriaListWithId.value]
+
+    emits("update:criteriaList", criteriaListWithId.value)
+    emits("listDataChange", criteriaListWithId.value)
+}
+
+const handleTypeChange = (idPath = [], type) => {
+    // 使用 findNodeByPath 找到目标节点
+    const { node } = findNodeByPath(idPath)
+    // 如果找不到目标节点，则进行警告
+    if (!node) {
+        console.warn("未找到目标节点", idPath)
+        return
+    }
+    node.type = type
+    node.operator = ""
+    node.value = ""
+    // 触发 Vue 响应式更新
+    criteriaListWithId.value = [...criteriaListWithId.value]
+
+    emits("update:criteriaList", criteriaListWithId.value)
+    emits("listDataChange", criteriaListWithId.value)
+}
+
+const handleOperatorChange = (idPath = [], operator) => {
+    // 使用 findNodeByPath 找到目标节点
+    const { node } = findNodeByPath(idPath)
+    // 如果找不到目标节点，则进行警告
+    if (!node) {
+        console.warn("未找到目标节点", idPath)
+        return
+    }
+    node.operator = operator
+    node.value = ""
     // 触发 Vue 响应式更新
     criteriaListWithId.value = [...criteriaListWithId.value]
 
