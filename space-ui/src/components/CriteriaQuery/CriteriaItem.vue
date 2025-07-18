@@ -17,38 +17,12 @@
             <!-- 默认内容插槽 -->
             <div class="criteria-slot-container">
                 <slot name="criteria-content" :criteriaItem="criteriaItem">
-                    <el-select
-                        v-model="criteriaItem.type"
-                        placeholder="请选择类型"
-                        @change="(type) => typeChange(criteriaItem?.idPath, type)"
+                    <CriteriaContent
+                        :criteriaItem="criteriaItem"
+                        @type-change="(idPath, type) => typeChange(idPath, type)"
+                        @operator-change="(idPath, operator) => operatorChange(idPath, operator)"
                     >
-                        <el-option
-                            v-for="item in typeMap"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                        >
-                        </el-option>
-                    </el-select>
-                    <el-select
-                        v-model="criteriaItem.operator"
-                        placeholder="请选择操作"
-                        @change="(operator) => operatorChange(criteriaItem?.idPath, operator)"
-                    >
-                        <el-option
-                            v-for="item in getOperators(criteriaItem.type)"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                        >
-                        </el-option>
-                    </el-select>
-                    <component
-                        :is="getComponent(criteriaItem.type)"
-                        v-model="criteriaItem.value"
-                        v-bind="getComponentProps(criteriaItem.type)"
-                    >
-                    </component>
+                    </CriteriaContent>
                 </slot>
             </div>
             <!-- 按钮插槽 -->
@@ -105,15 +79,11 @@
 
 <script setup>
 import { defineEmits, ref, onMounted } from "vue"
+import CriteriaContent from "@/components/CriteriaQuery/CriteriaContent.vue"
+import { DEFAULT_CRITERIA_STYLE, logicMap } from "@/components/CriteriaQuery/config/criteriaConfig.js"
 import { getCssVariableValue } from "@/utils/domUtils.js"
-import { validateArray, validateNumber } from "@/utils/validate.js"
 import { getIcon } from "@/utils/iconUtils.js"
-import TextInput from "@/components/CriteriaQuery/components/TextInput.vue"
-import DateInput from "@/components/CriteriaQuery/components/DateInput.vue"
-import DateTimeInput from "@/components/CriteriaQuery/components/DateTimeInput.vue"
-import NumberInput from "@/components/CriteriaQuery/components/NumberInput.vue"
-import FixedOptionsInput from "@/components/CriteriaQuery/components/FixedOptionsInput.vue"
-import BooleanInput from "@/components/CriteriaQuery/components/BooleanInput.vue"
+import { validateArray, validateNumber } from "@/utils/validate.js"
 
 const props = defineProps({
     // 当前条件项
@@ -174,102 +144,6 @@ const emits = defineEmits([
     "update-sibling-count"
 ])
 
-// 默认条件项样式配置对象
-const DEFAULT_CRITERIA_STYLE = {
-    itemGap: 10,
-    connectorWidth: 24,
-    connectorHeight: 28,
-    logicWidth: 16
-}
-// 逻辑映射对象
-const logicMap = {
-    and: {
-        text: "且",
-        toggleTo: "or"
-    },
-    or: {
-        text: "或",
-        toggleTo: "and"
-    }
-}
-// 类型映射对象
-const typeMap = [
-    {
-        label: "文本",
-        value: "text"
-    },
-    {
-        label: "日期",
-        value: "date"
-    },
-    {
-        label: "日期时间",
-        value: "datetime"
-    },
-    {
-        label: "数值",
-        value: "number"
-    },
-    {
-        label: "固定选项",
-        value: "fixedOptions"
-    },
-    {
-        label: "是非判断",
-        value: "boolean"
-    }
-]
-// 操作符映射对象
-const operatorMap = {
-    text: [
-        { label: "包含", value: "contains" },
-        { label: "不包含", value: "notContains" },
-        { label: "等于", value: "equals" },
-        { label: "不等于", value: "notEquals" }
-    ],
-    date: [
-        { label: "等于", value: "equals" },
-        { label: "不等于", value: "notEquals" },
-        { label: "大于", value: "greaterThan" },
-        { label: "小于", value: "lessThan" },
-        { label: "大于等于", value: "greaterThanOrEquals" },
-        { label: "小于等于", value: "lessThanOrEquals" }
-    ],
-    datetime: [
-        { label: "等于", value: "equals" },
-        { label: "不等于", value: "notEquals" },
-        { label: "大于", value: "greaterThan" },
-        { label: "小于", value: "lessThan" },
-        { label: "大于等于", value: "greaterThanOrEquals" },
-        { label: "小于等于", value: "lessThanOrEquals" }
-    ],
-    number: [
-        { label: "等于", value: "equals" },
-        { label: "不等于", value: "notEquals" },
-        { label: "大于", value: "greaterThan" },
-        { label: "小于", value: "lessThan" },
-        { label: "大于等于", value: "greaterThanOrEquals" },
-        { label: "小于等于", value: "lessThanOrEquals" }
-    ],
-    fixedOptions: [
-        { label: "等于", value: "equals" },
-        { label: "不等于", value: "notEquals" }
-    ],
-    boolean: [
-        { label: "等于", value: "equals" },
-        { label: "不等于", value: "notEquals" }
-    ]
-}
-// 组件映射对象
-const componentMap = {
-    text: TextInput,
-    date: DateInput,
-    datetime: DateTimeInput,
-    number: NumberInput,
-    fixedOptions: FixedOptionsInput,
-    boolean: BooleanInput
-}
-
 // ref 对象，用于响应式地处理 DOM 元素或组件实例
 const criteriaItemRef = ref(null)
 
@@ -278,11 +152,6 @@ const criteriaItemGap = ref(DEFAULT_CRITERIA_STYLE.itemGap)
 const criteriaConnectorWidth = ref(DEFAULT_CRITERIA_STYLE.connectorWidth)
 const criteriaConnectorHeight = ref(DEFAULT_CRITERIA_STYLE.connectorHeight)
 const criteriaLogicWidth = ref(DEFAULT_CRITERIA_STYLE.logicWidth)
-// 固定选项数据
-const fixedOptions = ref([
-    { label: "启用", value: "enabled" },
-    { label: "停用", value: "disabled" }
-])
 
 const getParentIdPath = (idPath) => {
     return idPath.length > 0 ? idPath.slice(0, -1) : []
@@ -297,23 +166,6 @@ const getPrevSiblingCount = (list = props.criteriaItem?.children, index = 0) => 
         return list?.[index - 1]?.childCount ?? 0
     }
     return 0
-}
-
-const getOperators = (type = props.criteriaItem?.type) => {
-    return operatorMap[type] || []
-}
-
-const getComponent = (type = props.criteriaItem?.type) => {
-    return componentMap[type] || null
-}
-
-const getComponentProps = (type = props.criteriaItem?.type) => {
-    if (type === "fixedOptions") {
-        return {
-            options: fixedOptions.value
-        }
-    }
-    return {}
 }
 
 const getItemPosition = (index = props.index) => {
