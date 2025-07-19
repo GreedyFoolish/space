@@ -27,6 +27,7 @@
 <script setup>
 import { defineEmits, ref, onBeforeMount } from "vue"
 import CriteriaItem from "@/components/CriteriaQuery/CriteriaItem.vue"
+import { throttle } from "@/utils/throttle.js";
 import { generateUUID } from "@/utils/uuidUtils.js"
 import { validateArray, validateNumber } from "@/utils/validate.js"
 
@@ -68,6 +69,14 @@ const getPrevSiblingCount = (list = criteriaListWithId.value, index = 0) => {
     }
     return 0
 }
+
+const throttledMessage = throttle((message, type = "warning", duration = 1000) => {
+    ElMessage({
+        message,
+        type,
+        duration
+    });
+}, 1000)
 
 const findNodeByPath = (path, root = criteriaListWithId.value) => {
     let currentLevel = root
@@ -182,6 +191,16 @@ const handleAddChildCriteria = (idPath = []) => {
 }
 
 const handleRemoveCriteria = (idPath = []) => {
+    // 校验 idPath 是否合法
+    if (!validateArray(idPath, "idPath", { minLength: 1 })) {
+        console.warn("非法路径：idPath 必须是非空数组", idPath);
+        return;
+    }
+    // 不能删除所有条件项
+    if (idPath.length === 1 && criteriaListWithId.value.length === 1) {
+        throttledMessage("不能删除所有条件项");
+        return;
+    }
     // 如果路径存在，则使用 findNodeByPath 定位目标父级节点并删除
     const { parent, index } = findNodeByPath(idPath)
 
